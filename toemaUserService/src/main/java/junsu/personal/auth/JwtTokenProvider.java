@@ -5,11 +5,17 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.HttpHeaders;
+import junsu.personal.dto.TokenDTO;
+import junsu.personal.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 //import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -41,7 +47,7 @@ public class JwtTokenProvider {
      * @param tokenType token 유형
      * @return  인증 처리한 정보(로그인 성공, 실패)
      */
-    public String createToke(String userId, String roles, JwtTokenType tokenType){
+    public String createToken(String userId, String roles, JwtTokenType tokenType){
         log.info(this.getClass().getName() + ".createToken Start!!!!!!!");
         log.info("userId : " + userId);
 
@@ -70,5 +76,74 @@ public class JwtTokenProvider {
                 .setExpiration(new Date(now.getTime() + (validTime * 1000))) // set Expire Time
                 .signWith(secret, SignatureAlgorithm.HS256) // 사용할 암호화 알고리즘
                 .compact();
+    }
+
+    /**
+     * JWT 토큰(Access Token, Refresh Token)에 저장된 값 가져오기
+     * @param token 토큰
+     * @return 회원아이디
+     */
+    public TokenDTO getTokenInfo(String token){
+        log.info(this.getClass().getName() + ".getTokenInfo Start!!!");
+
+        // 보안키 문자 JWT Key 형태로 변환
+        SecretKey secret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+
+        // JWT 토큰 정보
+        Claims claims = Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token).getBody();
+
+        String userId = CmmUtil.nvl(claims.getSubject());
+        String role = CmmUtil.nvl((String) claims.get("roles")); // LoginService 생성된 토큰의 권한명과 동일
+
+        log.info("userId : " + userId);
+        log.info("role : " + role);
+
+        // TokenDTO는 자바17의 Record 객체 사용했기에 빌더 패턴 적용
+        TokenDTO rDTO = TokenDTO.builder().userId(userId).role(role).build();
+
+
+        log.info(this.getClass().getName() + ".getTokenInfo End!!!");
+
+        return rDTO;
+    }
+
+    public String resolveToken(HttpServletRequest request, JwtTokenType tokenType){
+        log.info(this.getClass().getName() + ".resolveToken Start!!!!!");
+
+        String tokenName = "";
+
+        if(tokenType == JwtTokenType.ACCESS_TOKEN){
+            tokenName = accessTokenName;
+        }else if(tokenType == JwtTokenType.REFRESH_TOKEN){
+            tokenName = refreshTokenName;
+        }
+
+        String token = "";
+        Cookie[] cookies = request.getCookies();
+        // Cookie에 저장된 데이터 모두 가져오기
+        if(cookies != null){
+            for(Cookie key : request.getCookies()){
+                log.info("cookie 이름 : " + key.getName());
+                if(key.getName().equals(tokenName)){
+                    token = CmmUtil.nvl(key.getValue());
+                    break;
+                }
+            }
+        }
+        
+        //  쿠키에 토큰 없으면, Bearer 토큰에 값이 있는지 확인
+        if(token.length() == 0){
+            String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+            log.info("bearerToken : " + bearerToken);
+            if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(HEADER_PREFIX)){
+                token = bearerToken.substring(7);
+            }
+
+            log.info("bearerToken token : " + token);
+        }
+        
+        log.info(this.getClass().getName() + ".resolveToken End!!!!!");
+        return token;
     }
 }
