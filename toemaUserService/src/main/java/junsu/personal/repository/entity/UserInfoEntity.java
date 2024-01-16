@@ -42,4 +42,15 @@ public class UserInfoEntity {
     @Column(name="ROLES", nullable = false)
     private String roles;
 
+    @Column(name = "reg_id", updatable = false)
+    private String regId;
+
+    @Column(name = "reg_dt", updatable = false)
+    private String regDt;
+
+    @Column(name = "chg_id")
+    private String chgId;
+
+    @Column(name = "chg_dt")
+    private String chgDt;
 }
