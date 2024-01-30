@@ -23,14 +23,17 @@ spring:
       hibernate:
         naming:
           physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-
-# Thymeleaf Setting
+  # Thymeleaf Setting
 #------------------------------------
   thymeleaf:
     cache: false
     check-template-location: true
     prefix: classpath:/templates/
     suffix: .html
+  data:
+    redis:
+      host: localhost
+      port: 6379
 jwt:
   token:
     creator: poly
