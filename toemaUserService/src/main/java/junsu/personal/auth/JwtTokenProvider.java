@@ -39,6 +39,13 @@ public class JwtTokenProvider {
     @Value("$(jwt.token.refresh.name)")
     private String refreshTokenName;
 
+    /*
+    * Bearer Token Authentication
+    * 헤더에 토큰을 포함아여 전송 Authorization 헤더에 포함하여 전송한다
+    * JWT 토큰을 사용하여 인증하고
+    * 간단한 방식, 상태를 유지하지 않음, 확장성이 높음 등의 장점을 가짐
+    * 단점으로는 토큰 노출 위험이 있고, 토큰 관리등..
+    * */
     public static final String HEADER_PREFIX = "Bearer";
 
     /**
