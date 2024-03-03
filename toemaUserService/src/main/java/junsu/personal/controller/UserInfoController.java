@@ -1,4 +1,4 @@
-package junsu.personal.controller;
-
-public class UserInfoController {
-}
+//package junsu.personal.controller;
+//
+//public class UserInfoController {
+//}

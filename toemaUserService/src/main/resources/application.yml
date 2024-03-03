@@ -1,8 +1,8 @@
 spring:
+  server:
+    port: 10000
   profiles:
     active: prod
-  server:
-    port: 11000
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://192.168.131.129/myDB
@@ -34,6 +34,12 @@ spring:
     redis:
       host: localhost
       port: 6379
+  # MultipartFile
+#------------------------------------
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 jwt:
   token:
     creator: poly
@@ -47,11 +53,6 @@ jwt:
       name: jwtAccessToken
   secret:
     key: '12345678123456781234567812345678123456781234'
-eureka:
-  client:
-    fetch-registry: 'true'
-    register-with-eureka: 'true'
-    service-url:
-      defaultZone: http://localhost:8761/eureka
+
 api:
   gateway: localhost:13000
