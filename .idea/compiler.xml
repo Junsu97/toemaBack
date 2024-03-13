@@ -10,5 +10,10 @@
         <module name="personal.main" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="generic_util" target="17" />
+      <module name="generic_util.main" target="17" />
+      <module name="generic_util.test" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

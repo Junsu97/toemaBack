@@ -5,7 +5,7 @@ spring:
     active: prod
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://192.168.131.129/myDB
+    url: jdbc:mariadb://192.168.131.131/personal
     username: web_user
     password: 1234
 
