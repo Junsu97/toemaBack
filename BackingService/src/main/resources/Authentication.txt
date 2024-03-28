@@ -5,7 +5,7 @@ Basic Authentication
 Authorization : Basic ~~~~~~
 
 Bearer Token Authentication
-    - 헤얻에 토큰을 포함하여 전송 Authorization 헤더에 포함하여 전송
+    - 헤더에 토큰을 포함하여 전송 Authorization 헤더에 포함하여 전송
     - JWT 를 사용하여 인증
     - 간단한 방식, 상태를 유지하지 않음, 확장성이 높음 >> 장점
     - 토큰 노출 위험, 토큰 관리 어려움 >> 단점

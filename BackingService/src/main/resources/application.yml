@@ -1,6 +1,5 @@
 spring:
-  server:
-    port: 10000
+
   profiles:
     active: prod
   datasource:
@@ -8,7 +7,8 @@ spring:
     url: jdbc:mariadb://192.168.131.131/personal
     username: web_user
     password: 1234
-
+server:
+  port: 10000
   # JPA Configuration
   #----------------------------------
   jpa:
