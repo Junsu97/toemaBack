@@ -18,6 +18,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/***
+ * 클라이언트가 서버에 요청할 때
+ * 바로 컨트롤러로 가는게 아니라
+ * 서버로직 뒤에 여러개의 필터를 거쳐서 컨트롤러 넘어가게됨.
+ */
+
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

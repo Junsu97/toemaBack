@@ -4,6 +4,7 @@
 400
 - 유효성 검증 실패 : "VF" / "Validation Failed."
 - 중복된 아이디 : "DI" / "Duplication ID."
+- 중복된 이메일 : "DE" / "DUPLICATE_EMAIL"
 - 중복된 닉네임 : "DN" / "Duplication Nickname."
 - 존재하지 않는 유저 : "NU" / "This user does not exist."
 - 존재하지 않는 게시물 : "NB" / "This board does not exists."
