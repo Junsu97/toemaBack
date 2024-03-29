@@ -3,6 +3,8 @@ package junsu.personal.provider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,10 +13,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class JwtProvider {
 
     @Value("${jwt.secret.key}")
     private String secretKey;
+
 
     public String create(String email){
         Date expiredDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
@@ -27,6 +32,7 @@ public class JwtProvider {
 
         return jwt;
     }
+
 
     public String validate(String jwt){
         Claims claims = null;

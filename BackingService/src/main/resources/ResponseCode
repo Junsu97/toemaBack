@@ -1,0 +1,19 @@
+200
+- 성공 : "SU" / "Success."
+
+400
+- 유효성 검증 실패 : "VF" / "Validation Failed."
+- 중복된 아이디 : "DI" / "Duplication ID."
+- 중복된 닉네임 : "DN" / "Duplication Nickname."
+- 존재하지 않는 유저 : "NU" / "This user does not exist."
+- 존재하지 않는 게시물 : "NB" / "This board does not exists."
+
+401
+- 로그인 실패 : "SF" / "Login information mismatch."
+- 인증 실패 : "AF" / "Authorization Failed."
+
+403
+- 권한 없음 : "NP" / "Do not have permission."
+
+500
+- 데이터베이스 에러 : "DBE" / "Database Error."
