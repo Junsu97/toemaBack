@@ -9,6 +9,7 @@ public interface ResponseMessage {
     String DUPLICATE_ID = "Duplication ID.";
     String DUPLICATE_NICKNAME = "Duplication Nickname.";
     String DUPLICATE_EMAIL = "Duplication Email.";
+    String DUPLICATE_TEL_NUMBER = "Duplication Tel Number.";
 
     String NOT_EXISTED_USER = "This user does not exist.";
     String NOT_EXISTED_BOARD = "This board does not exist.";

@@ -20,8 +20,12 @@ public class SignUpResponseDTO extends ResponseDTO {
         ResponseDTO result = new ResponseDTO(ResponseCode.DUPLICATE_ID, ResponseMessage.DUPLICATE_ID);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
     }
-    public static ResponseEntity<ResponseDTO> duplicateEmain(){
+    public static ResponseEntity<ResponseDTO> duplicateEmail(){
         ResponseDTO result = new ResponseDTO(ResponseCode.DUPLICATE_EMAIL, ResponseMessage.DUPLICATE_EMAIL);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+    }
+    public static ResponseEntity<ResponseDTO> duplicateTelNumber(){
+        ResponseDTO result = new ResponseDTO(ResponseCode.DUPLICATE_TEL_NUMBER, ResponseMessage.DUPLICATE_TEL_NUMBER);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
     }
     public static ResponseEntity<ResponseDTO> duplicateNickname(){
