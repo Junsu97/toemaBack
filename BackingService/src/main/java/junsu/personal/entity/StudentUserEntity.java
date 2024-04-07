@@ -11,7 +11,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "user")
+@Entity(name = "student_user")
 @Table(name="STUDENT_USER")
 @DynamicInsert
 @DynamicUpdate
@@ -30,6 +30,9 @@ public class StudentUserEntity {
     @NonNull
     @Column(name = "EMAIL", nullable = false)
     private String email;
+
+    @Column(name = "TEL_NUMBER")
+    private String telNumber;
 
     @NonNull
     @Column(name = "NICKNAME", nullable = false)

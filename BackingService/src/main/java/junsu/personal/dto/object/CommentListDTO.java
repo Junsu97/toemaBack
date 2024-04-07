@@ -1,12 +1,11 @@
 package junsu.personal.dto.object;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public record CommentListDTO(
         String nickName,
         String profileImage,
