@@ -1,13 +1,10 @@
 package junsu.personal.dto.request.auth;
 
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 
 @Builder
-//@JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public record SignUpRequestDTO(
+public record TeacherSignUpRequestDTO(
         /**
          * @NotBlank 는 문자열에서 null값과 공백("   ") 및 빈 문자열("") 을 허용하지 않음
          */
@@ -23,12 +20,13 @@ public record SignUpRequestDTO(
         String telNumber,
         @NotBlank @Email
         String email,
+        String school,
+        Boolean schoolAuth,
         @NotBlank
         String addr,
         String addrDetail,
         String profileImage,
-        String faceId,
-        @NotNull @AssertTrue
-        Boolean agreedPersonal
+        String faceId
+
 ) {
 }

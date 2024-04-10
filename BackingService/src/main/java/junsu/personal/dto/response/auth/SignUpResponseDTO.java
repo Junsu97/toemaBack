@@ -32,6 +32,9 @@ public class SignUpResponseDTO extends ResponseDTO {
         ResponseDTO result = new ResponseDTO(ResponseCode.DUPLICATE_NICKNAME, ResponseMessage.DUPLICATE_NICKNAME);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
     }
-
+    public static ResponseEntity<ResponseDTO> validateUniversityEmailVerification(){
+        ResponseDTO result = new ResponseDTO(ResponseCode.VALIDATION_FAILED, ResponseMessage.VALIDATION_FAILED);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+    }
 
 }

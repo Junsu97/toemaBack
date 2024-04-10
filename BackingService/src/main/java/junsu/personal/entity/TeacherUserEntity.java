@@ -11,12 +11,12 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "STUDENT_USER")
-@Table(name = "STUDENT_USER")
+@Entity(name = "TEACHER_USER")
+@Table(name="TEACHER_USER")
 @DynamicInsert
 @DynamicUpdate
 @Builder
-public class StudentUserEntity {
+public class TeacherUserEntity {
     @Id
     @Column(name = "USER_ID")
     private String userId;
@@ -26,6 +26,14 @@ public class StudentUserEntity {
     @NonNull
     @Column(name = "PASSWORD", length = 100, nullable = false)
     private String password;
+
+    @NonNull
+    @Column(name = "SCHOOL", nullable = false)
+    private String school;
+
+    @NonNull
+    @Column(name="SCHOOL_AUTH", nullable = false)
+    private boolean schoolAuth;
 
     @NonNull
     @Column(name = "EMAIL", nullable = false)
@@ -51,4 +59,8 @@ public class StudentUserEntity {
     private String profileImage;
     @Column(name = "FACE_ID")
     private String faceId;
+
+
+
+
 }

@@ -1,5 +1,4 @@
 spring:
-
   profiles:
     active: prod
   datasource:
@@ -7,35 +6,35 @@ spring:
     url: jdbc:mariadb://192.168.131.133/myDB
     username: poly
     password: 1234
-server:
-  port: 10000
-  # JPA Configuration
-  #----------------------------------
+  data:
+    mongodb:
+      host: 192.168.131.133
+      database: MyDB
+      port: 27017
+      username: myUser
+      password: 1234
   jpa:
     generate-ddl: false
     hibernate:
       ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    #      ddl-auto: update
     open-in-view: false
     show-sql: true
     properties:
       hibernate.format_sql: true
       hibernate.use_sql_comments: true
-      hibernate:
-        naming:
-          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-  # Thymeleaf Setting
-#------------------------------------
-  thymeleaf:
-    cache: false
-    check-template-location: true
-    prefix: classpath:/templates/
-    suffix: .html
-  data:
-    redis:
-      host: localhost
-      port: 6379
+
+
+server:
+  port: 10000
+  # JPA Configuration
+  #----------------------------------
+
+
   # MultipartFile
-#------------------------------------
+  #------------------------------------
   servlet:
     multipart:
       max-file-size: 100MB
@@ -56,3 +55,7 @@ jwt:
 
 api:
   gateway: localhost:13000
+
+univCert:
+  api:
+    key: '66197667-ef57-4bc8-a944-4815185c9e77'
