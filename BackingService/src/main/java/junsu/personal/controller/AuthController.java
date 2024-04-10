@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.univcert.api.UnivCert;
 import io.swagger.annotations.ApiOperation;
 import jakarta.validation.Valid;
-import junsu.personal.dto.request.auth.MailDTO;
-import junsu.personal.dto.request.auth.SignInRequestDTO;
-import junsu.personal.dto.request.auth.StudentSignUpRequestDTO;
-import junsu.personal.dto.request.auth.TeacherSignUpRequestDTO;
+import junsu.personal.dto.request.auth.*;
 import junsu.personal.dto.response.auth.SignInResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.service.impl.AuthService;
@@ -32,23 +29,32 @@ public class AuthController {
 
     @Value("${univCert.api.key}")
     private String univCertAPI;
+
+
+    @PostMapping("/sign-up")
+    public ResponseEntity<? super SignUpResponseDTO> signUp(@RequestBody @Valid SignUpRequestDTO requestBody){
+        log.info(this.getClass().getName() + "signUp Start!!!!!!!!");
+        ResponseEntity<? super SignUpResponseDTO> response = authService.signUp(requestBody);
+        log.info(this.getClass().getName() + "signUp End!!!!!!!!");
+        return response;
+    }
     
     // 학생 회원가입
-    @PostMapping(value = "/student/sign-up")
-    public ResponseEntity<? super SignUpResponseDTO> studentSignUp(@RequestBody @Valid StudentSignUpRequestDTO requestBody){
-        log.info(this.getClass().getName() + "start studentSignUp!!!!!!!!!!");
-        ResponseEntity<? super SignUpResponseDTO> response = authService.studentSignUp(requestBody);
-        log.info(this.getClass().getName() + "end studentSignUp!!!!!!!!!!");
-        return response;
-    }
-    // 선생 회원가입
-    @PostMapping(value = "/teacher/sign-up")
-    public ResponseEntity<? super SignUpResponseDTO> teacherSignUp(@RequestBody @Valid TeacherSignUpRequestDTO requestBody){
-        log.info(this.getClass().getName() + "start teacherSignUp!!!!!!!!!!");
-        ResponseEntity<? super SignUpResponseDTO> response = authService.teacherSignUp(requestBody);
-        log.info(this.getClass().getName() + "end teacherSignUp!!!!!!!!!!");
-        return response;
-    }
+//    @PostMapping(value = "/student/sign-up")
+//    public ResponseEntity<? super SignUpResponseDTO> studentSignUp(@RequestBody @Valid StudentSignUpRequestDTO requestBody){
+//        log.info(this.getClass().getName() + "start studentSignUp!!!!!!!!!!");
+//        ResponseEntity<? super SignUpResponseDTO> response = authService.studentSignUp(requestBody);
+//        log.info(this.getClass().getName() + "end studentSignUp!!!!!!!!!!");
+//        return response;
+//    }
+//    // 선생 회원가입
+//    @PostMapping(value = "/teacher/sign-up")
+//    public ResponseEntity<? super SignUpResponseDTO> teacherSignUp(@RequestBody @Valid TeacherSignUpRequestDTO requestBody){
+//        log.info(this.getClass().getName() + "start teacherSignUp!!!!!!!!!!");
+//        ResponseEntity<? super SignUpResponseDTO> response = authService.teacherSignUp(requestBody);
+//        log.info(this.getClass().getName() + "end teacherSignUp!!!!!!!!!!");
+//        return response;
+//    }
 
     //대학메일 인증
     @PostMapping(value = "/validation/teacher/mail/send")

@@ -3,10 +3,8 @@ package junsu.personal.service.impl;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import junsu.personal.auth.UserRole;
-import junsu.personal.dto.request.auth.MailDTO;
-import junsu.personal.dto.request.auth.SignInRequestDTO;
-import junsu.personal.dto.request.auth.StudentSignUpRequestDTO;
-import junsu.personal.dto.request.auth.TeacherSignUpRequestDTO;
+import junsu.personal.auth.UserType;
+import junsu.personal.dto.request.auth.*;
 import junsu.personal.dto.response.ResponseDTO;
 import junsu.personal.dto.response.auth.SignInResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
@@ -37,9 +35,9 @@ public class AuthService implements IAuthService {
 
 
     @Override
-    public ResponseEntity<? super SignUpResponseDTO> studentSignUp(StudentSignUpRequestDTO pDTO) {
-        log.info(this.getClass().getName() + ".teacherSignUp Start!!!!!");
-        try {
+    public ResponseEntity<? super SignUpResponseDTO> signUp(SignUpRequestDTO pDTO) {
+        log.info(this.getClass().getName() + "signUp Start!!!");
+        try{
             String userId = pDTO.userId();
             boolean existedStudentUserId = studentUserRepository.existsByUserId(userId);
             boolean existedTeacherUserId = teacherUserRepository.existsByUserId(userId);
@@ -66,21 +64,40 @@ public class AuthService implements IAuthService {
             String addr = pDTO.addr();
             String addrDetail = pDTO.addrDetail();
             String role = pDTO.roles();
+            String userType = pDTO.userType();
 
+            if(userType.equalsIgnoreCase(UserType.STUDENT.getValue())){
+                StudentUserEntity studentUserEntity = StudentUserEntity.builder()
+                        .userId(userId).userName(pDTO.userName())
+                        .password(encodedPassword)
+                        .telNumber(telNumber)
+                        .email(email)
+                        .addr(addr)
+                        .addrDetail(addrDetail)
+                        .nickname(nickname)
+                        .role(role)
+                        .build();
 
-            StudentUserEntity studentUserEntity = StudentUserEntity.builder()
-                    .userId(userId).userName(pDTO.userName())
-                    .password(encodedPassword)
-                    .telNumber(telNumber)
-                    .email(email)
-                    .addr(addr)
-                    .addrDetail(addrDetail)
-                    .nickname(nickname)
-                    .role(role)
-                    .build();
+                studentUserRepository.save(studentUserEntity);
+            }else{
+                String school = pDTO.school();
+                TeacherUserEntity teacherUserEntity = TeacherUserEntity.builder()
+                        .userId(userId).userName(pDTO.userName())
+                        .password(encodedPassword)
+                        .telNumber(telNumber)
+                        .school(school)
+                        .schoolAuth(false)
+                        .email(email)
+                        .addr(addr)
+                        .addrDetail(addrDetail)
+                        .nickname(nickname)
+                        .role(role)
 
-            studentUserRepository.save(studentUserEntity);
-        } catch (Exception e) {
+                        .build();
+
+                teacherUserRepository.save(teacherUserEntity);
+            }
+        }catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }finally {
@@ -89,61 +106,6 @@ public class AuthService implements IAuthService {
 
         return SignUpResponseDTO.success();
     }
-
-    @Override
-    public ResponseEntity<? super SignUpResponseDTO> teacherSignUp(TeacherSignUpRequestDTO pDTO) {
-        log.info(this.getClass().getName() + ".teacherSignUp Start!!!!!");
-        try {
-            String userId = pDTO.userId();
-            boolean existedUserId = studentUserRepository.existsByUserId(userId);
-            if (existedUserId) return SignUpResponseDTO.duplicateUserId();
-
-            String nickname = pDTO.nickname();
-            boolean existedNickname = studentUserRepository.existsByNickname(nickname);
-            if (existedNickname) return SignUpResponseDTO.duplicateNickname();
-
-            String email = pDTO.email();
-            boolean existedEmail = studentUserRepository.existsByEmail(email);
-            if (existedEmail) return SignUpResponseDTO.duplicateEmail();
-
-            String telNumber = pDTO.telNumber();
-            boolean existedTelNumber = studentUserRepository.existsByTelNumber(telNumber);
-            if (existedTelNumber) return SignUpResponseDTO.duplicateTelNumber();
-
-            String password = pDTO.password();
-            String encodedPassword = passwordEncoder.encode(password);
-
-            String addr = pDTO.addr();
-            String addrDetail = pDTO.addrDetail();
-
-            String school = pDTO.school();
-            String role = pDTO.roles();
-
-            TeacherUserEntity teacherUserEntity = TeacherUserEntity.builder()
-                    .userId(userId).userName(pDTO.userName())
-                    .password(encodedPassword)
-                    .telNumber(telNumber)
-                    .school(school)
-                    .schoolAuth(false)
-                    .email(email)
-                    .addr(addr)
-                    .addrDetail(addrDetail)
-                    .nickname(nickname)
-                    .role(role)
-
-                    .build();
-
-            teacherUserRepository.save(teacherUserEntity);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseDTO.databaseError();
-        }finally {
-            log.info(this.getClass().getName() + ".teacherSignUp End!!!!!");
-        }
-
-        return SignUpResponseDTO.success();
-    }
-
     @Override
     public ResponseEntity<? super SignUpResponseDTO> validateUnivEmail(MailDTO pDTO) {
         log.info(this.getClass().getName() + ".validateUnivEmail Start!!!!!");
@@ -173,7 +135,7 @@ public class AuthService implements IAuthService {
             String userId = pDTO.userId();
             String password = pDTO.password();
             String encodedPassword = null;
-            if (pDTO.userType().equals("STUDENT")) {
+            if (pDTO.userType().equalsIgnoreCase(UserType.STUDENT.getValue())) {
 
                 StudentUserEntity userEntity = studentUserRepository.findByUserId(userId);
 
@@ -185,7 +147,7 @@ public class AuthService implements IAuthService {
                 if (!isMatched) return SignInResponseDTO.signInFailed();
 
 
-            } else if (pDTO.userType().equals("TEACHER")) {
+            } else if (pDTO.userType().equalsIgnoreCase(UserType.TEACHER.getValue())) {
                 TeacherUserEntity userEntity = teacherUserRepository.findByUserId(userId);
 
                 if (userId == null) return SignInResponseDTO.signInFailed();
