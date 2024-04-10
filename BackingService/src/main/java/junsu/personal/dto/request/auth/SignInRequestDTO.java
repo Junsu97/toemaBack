@@ -8,6 +8,9 @@ public record SignInRequestDTO(
         @NotBlank
         String userId,
         @NotBlank
-        String password
+        String password,
+
+        @NotBlank
+        String userType
 ) {
 }

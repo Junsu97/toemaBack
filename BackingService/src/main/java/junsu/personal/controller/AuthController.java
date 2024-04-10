@@ -5,8 +5,10 @@ import com.univcert.api.UnivCert;
 import io.swagger.annotations.ApiOperation;
 import jakarta.validation.Valid;
 import junsu.personal.dto.request.auth.MailDTO;
+import junsu.personal.dto.request.auth.SignInRequestDTO;
 import junsu.personal.dto.request.auth.StudentSignUpRequestDTO;
 import junsu.personal.dto.request.auth.TeacherSignUpRequestDTO;
+import junsu.personal.dto.response.auth.SignInResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.service.impl.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.spring.web.json.Json;
 
 import java.util.Map;
 
@@ -31,6 +32,8 @@ public class AuthController {
 
     @Value("${univCert.api.key}")
     private String univCertAPI;
+    
+    // 학생 회원가입
     @PostMapping(value = "/student/sign-up")
     public ResponseEntity<? super SignUpResponseDTO> studentSignUp(@RequestBody @Valid StudentSignUpRequestDTO requestBody){
         log.info(this.getClass().getName() + "start studentSignUp!!!!!!!!!!");
@@ -38,7 +41,7 @@ public class AuthController {
         log.info(this.getClass().getName() + "end studentSignUp!!!!!!!!!!");
         return response;
     }
-
+    // 선생 회원가입
     @PostMapping(value = "/teacher/sign-up")
     public ResponseEntity<? super SignUpResponseDTO> teacherSignUp(@RequestBody @Valid TeacherSignUpRequestDTO requestBody){
         log.info(this.getClass().getName() + "start teacherSignUp!!!!!!!!!!");
@@ -47,6 +50,7 @@ public class AuthController {
         return response;
     }
 
+    //대학메일 인증
     @PostMapping(value = "/validation/teacher/mail/send")
     public JSONObject sendUnivCertMain(@RequestBody @Valid MailDTO mailDTO) throws Exception{
         log.info(this.getClass().getName() + "start Teacher sendMail!!!!!!!!!!");
@@ -88,6 +92,12 @@ public class AuthController {
         }
     }
 
+    @ApiOperation(value = "아이디 비밀번호를 입력해주세요", notes =  "로그인 API입니다.")
+    @PostMapping("/sign-in")
+    public ResponseEntity<? super SignInResponseDTO> signIn(@RequestBody @Valid SignInRequestDTO requestBody){
+        ResponseEntity<? super SignInResponseDTO> response = authService.signIn(requestBody);
+        return response;
+    }
     /**
      * 인증내역 초기화
      * @throws Exception

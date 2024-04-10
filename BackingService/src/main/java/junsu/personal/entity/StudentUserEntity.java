@@ -51,4 +51,7 @@ public class StudentUserEntity {
     private String profileImage;
     @Column(name = "FACE_ID")
     private String faceId;
+
+    @Column(name = "ROLE")
+    private String role;
 }

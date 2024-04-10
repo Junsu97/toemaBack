@@ -26,7 +26,9 @@ public record TeacherSignUpRequestDTO(
         String addr,
         String addrDetail,
         String profileImage,
-        String faceId
+        String faceId,
+        @NotBlank
+        String roles
 
 ) {
 }

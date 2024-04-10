@@ -26,7 +26,9 @@ public record StudentSignUpRequestDTO(
         String addr,
         String addrDetail,
         String profileImage,
-        String faceId
+        String faceId,
+        @NotBlank
+        String roles
 
 ) {
 }

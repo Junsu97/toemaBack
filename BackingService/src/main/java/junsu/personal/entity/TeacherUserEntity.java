@@ -33,7 +33,7 @@ public class TeacherUserEntity {
 
     @NonNull
     @Column(name="SCHOOL_AUTH", nullable = false)
-    private boolean schoolAuth;
+    private Boolean schoolAuth;
 
     @NonNull
     @Column(name = "EMAIL", nullable = false)
@@ -59,6 +59,9 @@ public class TeacherUserEntity {
     private String profileImage;
     @Column(name = "FACE_ID")
     private String faceId;
+
+    @Column(name = "ROLE")
+    private String role;
 
 
 

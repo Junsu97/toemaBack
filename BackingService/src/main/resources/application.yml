@@ -1,3 +1,5 @@
+server:
+  port: 10000
 spring:
   profiles:
     active: prod
@@ -26,21 +28,19 @@ spring:
       hibernate.format_sql: true
       hibernate.use_sql_comments: true
 
-
-server:
-  port: 10000
-  # JPA Configuration
-  #----------------------------------
-
-
   # MultipartFile
   #------------------------------------
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+
+  # JPA Configuration
+  #----------------------------------
+
 jwt:
   token:
+    expirationTime: 3600
     creator: poly
     refresh:
       valid:

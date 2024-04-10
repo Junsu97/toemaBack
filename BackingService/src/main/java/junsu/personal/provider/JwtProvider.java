@@ -21,12 +21,18 @@ public class JwtProvider {
     private String secretKey;
 
 
-    public String create(String email){
-        Date expiredDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
 
+
+    public String create(String userId, String roles){
+        Date expiredDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
+        Claims claims = Jwts.claims()
+                .setSubject(userId);
+
+        claims.put("roles", roles);
         String jwt = Jwts.builder()
+                .setClaims(claims)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
-                .setSubject(email).setIssuedAt(new Date())
+                .setIssuedAt(new Date())
                 .setExpiration(expiredDate)
                 .compact();
 
@@ -42,6 +48,8 @@ public class JwtProvider {
                     .setSigningKey(secretKey)
                     .parseClaimsJws(jwt)
                     .getBody();
+
+
         }catch (Exception e){
             e.printStackTrace();
             return null;
