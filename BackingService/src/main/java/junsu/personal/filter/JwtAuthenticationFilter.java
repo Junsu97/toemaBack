@@ -41,15 +41,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            String email = jwtProvider.validate(token);
+            String userId = jwtProvider.validate(token);
 
-            if(email == null){
+            if(userId == null){
                 filterChain.doFilter(request, response);
                 return;
             }
 
             AbstractAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(email, null, AuthorityUtils.NO_AUTHORITIES); // 유저 아이디 비번 권한
+                    new UsernamePasswordAuthenticationToken(userId, null, AuthorityUtils.NO_AUTHORITIES); // 유저 아이디 비번 권한
 
             // 웹 인증 세부정보 소스
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

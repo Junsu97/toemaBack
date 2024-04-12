@@ -63,7 +63,7 @@ public class AuthService implements IAuthService {
 
             String addr = pDTO.addr();
             String addrDetail = pDTO.addrDetail();
-            String role = pDTO.roles();
+            String role = "ROLE_USER";
             String userType = pDTO.userType();
 
             if(userType.equalsIgnoreCase(UserType.STUDENT.getValue())){

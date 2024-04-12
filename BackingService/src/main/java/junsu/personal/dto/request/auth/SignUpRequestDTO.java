@@ -1,9 +1,6 @@
 package junsu.personal.dto.request.auth;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 
 @Builder
@@ -29,9 +26,9 @@ public record SignUpRequestDTO(
         String addr,
         String addrDetail,
         String profileImage,
+        @NotNull
+        Boolean agreedPersonal,
         String faceId,
-        @NotBlank
-        String roles,
 
         @NotBlank
         String userType
