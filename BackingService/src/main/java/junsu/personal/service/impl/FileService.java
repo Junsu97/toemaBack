@@ -45,7 +45,8 @@ public class FileService implements IFileService {
 
         String originalFileName = file.getOriginalFilename();
         String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-        String saveFileName = DateUtil.getDateTime("HHmmss") + "." + extension;
+        String uuid = UUID.randomUUID().toString();
+        String saveFileName = uuid + extension;
 
         File uploadFile = convert(file);
         amazonS3Client.putObject(

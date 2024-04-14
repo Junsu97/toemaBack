@@ -26,5 +26,5 @@ public class ImageEntity {
     private String imageUrl;
 
     @Column(name="BOARD_NUMBER", nullable = false)
-    private String boardNumber;
+    private Long boardNumber;
 }
