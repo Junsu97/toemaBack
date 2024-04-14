@@ -32,8 +32,8 @@ spring:
   #------------------------------------
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
+      max-file-size: 10MB
+      max-request-size: 10MB
 
   # JPA Configuration
   #----------------------------------
@@ -59,3 +59,18 @@ api:
 univCert:
   api:
     key: '66197667-ef57-4bc8-a944-4815185c9e77'
+
+
+# AWS S3 Setting
+cloud:
+  aws:
+    credentials:
+      secret-key: EkImSQkHw4gnOz2s9AjCD37OWFL2T8YXvCy3YEbI
+      access-key: ErASUUxnO1XYocc3pIJn
+    s3:
+      bucket: personalprj/senierPRJ
+      endPoint: https://kr.object.ncloudstorage.com
+    region:
+      static: kr-standard
+    stack:
+      auto: 'false'
