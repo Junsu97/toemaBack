@@ -135,8 +135,9 @@ public class AuthService implements IAuthService {
             String userId = pDTO.userId();
             String password = pDTO.password();
             String encodedPassword = null;
+            String userType = "";
             if (pDTO.userType().equalsIgnoreCase(UserType.STUDENT.getValue())) {
-
+                userType = UserType.STUDENT.getValue();
                 StudentUserEntity userEntity = studentUserRepository.findByUserId(userId);
 
                 if (userEntity == null) return SignInResponseDTO.signInFailed();
@@ -148,6 +149,7 @@ public class AuthService implements IAuthService {
 
 
             } else if (pDTO.userType().equalsIgnoreCase(UserType.TEACHER.getValue())) {
+                userType = UserType.TEACHER.getValue();
                 TeacherUserEntity userEntity = teacherUserRepository.findByUserId(userId);
 
                 if (userId == null) return SignInResponseDTO.signInFailed();
@@ -159,7 +161,7 @@ public class AuthService implements IAuthService {
             }
 
 
-            token = jwtProvider.create(userId, UserRole.USER.getValue());
+            token = jwtProvider.create(userId, UserRole.USER.getValue(), userType);
 
         } catch (Exception e) {
             e.printStackTrace();

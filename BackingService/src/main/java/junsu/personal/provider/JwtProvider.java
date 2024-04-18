@@ -23,12 +23,13 @@ public class JwtProvider {
 
 
 
-    public String create(String userId, String roles){
+    public String create(String userId, String roles, String userType){
         Date expiredDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
         Claims claims = Jwts.claims()
                 .setSubject(userId);
 
         claims.put("roles", roles);
+        claims.put("userType", userType);
         String jwt = Jwts.builder()
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.HS256, secretKey)

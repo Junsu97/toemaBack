@@ -30,6 +30,12 @@ public class AuthController {
     @Value("${univCert.api.key}")
     private String univCertAPI;
 
+    @ApiOperation(value = "아이디 비밀번호를 입력해주세요", notes =  "로그인 API입니다.")
+    @PostMapping("/sign-in")
+    public ResponseEntity<? super SignInResponseDTO> signIn(@RequestBody @Valid SignInRequestDTO requestBody){
+        ResponseEntity<? super SignInResponseDTO> response = authService.signIn(requestBody);
+        return response;
+    }
 
     @PostMapping("/sign-up")
     public ResponseEntity<? super SignUpResponseDTO> signUp(@RequestBody @Valid SignUpRequestDTO requestBody){
@@ -45,12 +51,6 @@ public class AuthController {
         log.info(this.getClass().getName() + "start Teacher sendMail!!!!!!!!!!");
 //        Map<String, Object> response = UnivCert.certify(univCertAPI, mailDTO.univName(), mailDTO.email(),true);
         Map<String, Object> response = UnivCert.certify(univCertAPI, mailDTO.univName(), mailDTO.email(), true);
-        log.info(response.get("success").toString());
-        if(response.get("success").toString().equals("true")){
-            log.info("트루!");
-        }else{
-            log.info("거짓!");
-        }
         log.info(this.getClass().getName() + "end sendMail!!!!!!!!!!");
         return new JSONObject(response);
     }
@@ -80,13 +80,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(SignUpResponseDTO.validateUniversityEmailVerification());
         }
     }
-
-    @ApiOperation(value = "아이디 비밀번호를 입력해주세요", notes =  "로그인 API입니다.")
-    @PostMapping("/sign-in")
-    public ResponseEntity<? super SignInResponseDTO> signIn(@RequestBody @Valid SignInRequestDTO requestBody){
-        ResponseEntity<? super SignInResponseDTO> response = authService.signIn(requestBody);
-        return response;
-    }
+    
     /**
      * 인증내역 초기화
      * @throws Exception
