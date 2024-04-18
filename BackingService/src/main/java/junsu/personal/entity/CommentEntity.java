@@ -1,9 +1,14 @@
 package junsu.personal.entity;
 
 import jakarta.persistence.*;
+import junsu.personal.dto.request.board.PostCommentRequestDTO;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 
 @Getter
 @NoArgsConstructor
@@ -34,4 +39,14 @@ public class CommentEntity {
     @NonNull
     @Column(name="BOARD_NUMBER", nullable = false)
     private Long boardNumber;
+
+    public CommentEntity(PostCommentRequestDTO pDTO, Long boardNumber, String userId){
+        java.util.Date now = Date.from(Instant.now());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String writeDatetime = simpleDateFormat.format(now);
+        this.content = pDTO.content();
+        this.writeDatetime = writeDatetime;
+        this.userId = userId;
+        this.boardNumber = boardNumber;
+    }
 }

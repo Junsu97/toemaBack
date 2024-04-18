@@ -3,10 +3,8 @@ package junsu.personal.controller;
 import com.amazonaws.Response;
 import jakarta.validation.Valid;
 import junsu.personal.dto.request.board.PostBoardRequestDTO;
-import junsu.personal.dto.response.board.GetBoardResponseDTO;
-import junsu.personal.dto.response.board.GetFavoriteListResponseDTO;
-import junsu.personal.dto.response.board.PostBoardRResponseDTO;
-import junsu.personal.dto.response.board.PutFavoriteResponseDTO;
+import junsu.personal.dto.request.board.PostCommentRequestDTO;
+import junsu.personal.dto.response.board.*;
 import junsu.personal.service.IBoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +24,7 @@ public class BoardController {
     }
 
     @GetMapping("/{boardNumber}/favorite-list")
-    public ResponseEntity<? super GetFavoriteListResponseDTO> getFavoriteList(@PathVariable("boardNumber") Long boardNumber){
+    public ResponseEntity<? super GetFavoriteListResponseDTO> getFavoriteList(@PathVariable("boardNumber") Long boardNumber) {
         ResponseEntity<? super GetFavoriteListResponseDTO> response = boardService.getFavoriteList(boardNumber);
         return response;
     }
@@ -37,6 +35,16 @@ public class BoardController {
             @AuthenticationPrincipal String userId
     ) {
         ResponseEntity<? super PostBoardRResponseDTO> response = boardService.postBoard(requestBody, userId);
+        return response;
+    }
+
+    @PostMapping("{boardNumber}/comment")
+    public ResponseEntity<? super PostCommentResponseDTO> postComment(
+            @RequestBody @Valid PostCommentRequestDTO requestBody,
+            @PathVariable("boardNumber") Long boardNumber,
+            @AuthenticationPrincipal String userId
+    ) {
+        ResponseEntity<? super PostCommentResponseDTO> response = boardService.postComment(requestBody, boardNumber, userId);
         return response;
     }
 
