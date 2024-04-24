@@ -1,5 +1,6 @@
 package junsu.personal.repository;
 
+import jakarta.transaction.Transactional;
 import junsu.personal.entity.FavoriteEntity;
 import junsu.personal.entity.primaryKey.FavoritePk;
 import junsu.personal.repository.resultSet.GetFavoriteListResultSet;
@@ -38,4 +39,6 @@ public interface FavoriteRepository extends JpaRepository<FavoriteEntity, Favori
     )
     List<GetFavoriteListResultSet> getFavoriteList(Long boardNumber);
 
+    @Transactional
+    void deleteByBoardNumber(Long boardNumber);
 }

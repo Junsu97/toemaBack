@@ -3,6 +3,8 @@ package junsu.personal.service.impl;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
+import junsu.personal.dto.response.ResponseDTO;
+import junsu.personal.entity.ImageEntity;
 import junsu.personal.repository.ImageRepository;
 import junsu.personal.repository.StudentUserRepository;
 import junsu.personal.repository.TeacherUserRepository;
@@ -20,6 +22,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -92,12 +96,20 @@ public class FileService implements IFileService {
         log.info("File delete fail");
     }
 
-
     @Override
-    public int fileDelete(String fileName) throws Exception{
+    public int fileDelete(Long boardNumber) throws Exception{
         int res = 0;
         try{
-            amazonS3Client.deleteObject(bucket, fileName);
+            List<ImageEntity> deleteImageEntity = imageRepository.findByBoardNumber(boardNumber);
+            if(deleteImageEntity != null){
+                List<String> deleteImageList = new ArrayList<>();
+                for(int i = 0; i < deleteImageEntity.size(); i++){
+                    deleteImageList.add(deleteImageEntity.get(i).getImageUrl());
+                }
+                for(int i = 0; i < deleteImageList.size(); i++){
+                    amazonS3Client.deleteObject(bucket, deleteImageList.get(i));
+                }
+            }
             res = 1;
         }catch (AmazonS3Exception e){
             e.printStackTrace();;

@@ -1,6 +1,7 @@
 package junsu.personal.entity;
 
 import jakarta.persistence.*;
+import junsu.personal.dto.request.board.PatchBoardRequestDTO;
 import junsu.personal.dto.request.board.PostBoardRequestDTO;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -77,7 +78,11 @@ public class BoardEntity {
     public void increaseCommentCount(){
         this.commentCount++;
     }
-    public void decreaseCommnetCount(){
+    public void decreaseCommentCount(){
         this.commentCount--;
+    }
+    public void patchBoard(PatchBoardRequestDTO pDTO) {
+        this.title = pDTO.title();
+        this.content = pDTO.content();
     }
 }

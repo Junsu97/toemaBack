@@ -1,11 +1,16 @@
 package junsu.personal.controller;
 
+import junsu.personal.dto.response.ResponseDTO;
+import junsu.personal.entity.ImageEntity;
 import junsu.personal.service.IFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/file")
@@ -36,4 +41,5 @@ public class FileController {
         }
         return resource;
     }
+
 }

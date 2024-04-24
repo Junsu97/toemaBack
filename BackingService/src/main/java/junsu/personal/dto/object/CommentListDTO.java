@@ -1,15 +1,27 @@
 package junsu.personal.dto.object;
 
-import lombok.AllArgsConstructor;
+import junsu.personal.repository.resultSet.GetCommentListResultSet;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 public record CommentListDTO(
-        String nickName,
+        String nickname,
         String profileImage,
-        String writeDateTime,
+        String writeDatetime,
         String content
 ) {
+    public CommentListDTO(GetCommentListResultSet resultSet){
+        this(resultSet.getNickname(), resultSet.getProfileImage(), resultSet.getWriteDatetime(), resultSet.getContent());
+    }
+    public static List<CommentListDTO> copyList(List<GetCommentListResultSet> resultSets){
+        List<CommentListDTO> list = new ArrayList<>();
+        for(GetCommentListResultSet resultSet : resultSets){
+            CommentListDTO commentListDTO = new CommentListDTO(resultSet);
+            list.add(commentListDTO);
+        }
+        return list;
+    }
 }

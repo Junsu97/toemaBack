@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 public record FavoriteListDTO(
         String userId,
-        String nickName,
+        String nickname,
         String profileImage
 ) {
     // 모든 필드를 초기화하는 다른 생성자로 위임

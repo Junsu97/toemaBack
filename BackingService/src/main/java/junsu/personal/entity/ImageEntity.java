@@ -27,4 +27,9 @@ public class ImageEntity {
 
     @Column(name="BOARD_NUMBER", nullable = false)
     private Long boardNumber;
+
+    public ImageEntity(Long boardNumber, String imageUrl){
+        this.boardNumber = boardNumber;
+        this.imageUrl = imageUrl;
+    }
 }
