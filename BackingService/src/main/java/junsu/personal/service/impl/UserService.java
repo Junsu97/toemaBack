@@ -8,12 +8,10 @@ import junsu.personal.repository.StudentUserRepository;
 import junsu.personal.repository.TeacherUserRepository;
 import junsu.personal.service.IUserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class UserService implements IUserService {
     private final StudentUserRepository studentUserRepository;
@@ -21,7 +19,6 @@ public class UserService implements IUserService {
 
     @Override
     public ResponseEntity<? super GetSignInUserResponseDTO> getSignInUser(String userId) {
-        log.info(this.getClass().getName() + ".getSignInUser Start!!!!!!!");
         StudentUserEntity studentUserEntity = null;
         TeacherUserEntity teacherUserEntity = null;
         try {
@@ -33,8 +30,6 @@ public class UserService implements IUserService {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
-        } finally {
-            log.info(this.getClass().getName() + ".getSignInUser End!!!!!!!");
         }
 
         if (studentUserEntity != null && teacherUserEntity == null) {

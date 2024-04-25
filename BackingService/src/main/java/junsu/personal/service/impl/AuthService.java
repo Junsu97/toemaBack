@@ -1,15 +1,11 @@
 package junsu.personal.service.impl;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.transaction.Transactional;
 import junsu.personal.auth.UserRole;
 import junsu.personal.auth.UserType;
 import junsu.personal.dto.request.auth.*;
 import junsu.personal.dto.response.ResponseDTO;
 import junsu.personal.dto.response.auth.SignInResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
-import junsu.personal.entity.QStudentUserEntity;
-import junsu.personal.entity.QTeacherUserEntity;
 import junsu.personal.entity.StudentUserEntity;
 import junsu.personal.entity.TeacherUserEntity;
 import junsu.personal.provider.JwtProvider;
@@ -36,7 +32,6 @@ public class AuthService implements IAuthService {
 
     @Override
     public ResponseEntity<? super SignUpResponseDTO> signUp(SignUpRequestDTO pDTO) {
-        log.info(this.getClass().getName() + "signUp Start!!!");
         try{
             String userId = pDTO.userId();
             boolean existedStudentUserId = studentUserRepository.existsByUserId(userId);
@@ -100,15 +95,11 @@ public class AuthService implements IAuthService {
         }catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
-        }finally {
-            log.info(this.getClass().getName() + ".teacherSignUp End!!!!!");
         }
-
         return SignUpResponseDTO.success();
     }
     @Override
     public ResponseEntity<? super SignUpResponseDTO> validateUnivEmail(MailDTO pDTO) {
-        log.info(this.getClass().getName() + ".validateUnivEmail Start!!!!!");
         try {
             String userId = pDTO.userId();
             TeacherUserEntity entity = TeacherUserEntity.builder()
@@ -119,8 +110,6 @@ public class AuthService implements IAuthService {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
-        }finally {
-            log.info(this.getClass().getName() + ".validateUnivEmail End!!!!!");
         }
 
         return SignUpResponseDTO.success();
@@ -128,8 +117,6 @@ public class AuthService implements IAuthService {
 
     @Override
     public ResponseEntity<? super SignInResponseDTO> signIn(SignInRequestDTO pDTO) {
-
-        log.info(this.getClass().getName() + ".signIn Start!!!!!");
         String token = null;
         try {
             String userId = pDTO.userId();
@@ -166,8 +153,6 @@ public class AuthService implements IAuthService {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
-        }finally {
-            log.info(this.getClass().getName() + ".signIn End!!!!!");
         }
 
         return SignInResponseDTO.success(token);

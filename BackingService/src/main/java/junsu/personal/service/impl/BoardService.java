@@ -5,10 +5,7 @@ import junsu.personal.dto.request.board.PostBoardRequestDTO;
 import junsu.personal.dto.request.board.PostCommentRequestDTO;
 import junsu.personal.dto.response.ResponseDTO;
 import junsu.personal.dto.response.board.*;
-import junsu.personal.entity.BoardEntity;
-import junsu.personal.entity.CommentEntity;
-import junsu.personal.entity.FavoriteEntity;
-import junsu.personal.entity.ImageEntity;
+import junsu.personal.entity.*;
 import junsu.personal.repository.*;
 import junsu.personal.repository.resultSet.GetBoardResultSet;
 import junsu.personal.repository.resultSet.GetCommentListResultSet;
@@ -16,16 +13,18 @@ import junsu.personal.repository.resultSet.GetFavoriteListResultSet;
 import junsu.personal.service.IBoardService;
 import junsu.personal.service.IFileService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class BoardService implements IBoardService {
     private final BoardRepository boardRepository;
     private final StudentUserRepository userRepository;
@@ -33,6 +32,7 @@ public class BoardService implements IBoardService {
     private final ImageRepository imageRepository;
     private final FavoriteRepository favoriteRepository;
     private final CommentRepository commentRepository;
+    private final BoardListViewRepository boardListViewRepository;
     private final IFileService fileService;
 
     @Override
@@ -50,6 +50,33 @@ public class BoardService implements IBoardService {
             return ResponseDTO.databaseError();
         }
         return GetBoardResponseDTO.success(resultSet, imageEntities);
+    }
+
+    @Override
+    public ResponseEntity<? super GetLatestBoardListResponseDTO> getLatestBoardList() {
+        List<BoardListViewEntity> boardListViewEntities = new ArrayList<>();
+        try{
+            boardListViewEntities = boardListViewRepository.findByOrderByWriteDatetimeDesc();
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return GetLatestBoardListResponseDTO.success(boardListViewEntities);
+    }
+
+    @Override
+    public ResponseEntity<? super GetTop3BoardListResponseDTO> getTop3BoardList() {
+        List<BoardListViewEntity> boardListViewEntities = new ArrayList<>();
+        try{
+            Date beforeWeek = Date.from(Instant.now().minus(7, ChronoUnit.DAYS));
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String sevenDaysAgo = simpleDateFormat.format(beforeWeek);
+            boardListViewEntities = boardListViewRepository.findTop3ByWriteDatetimeGreaterThanOrderByFavoriteCountDescCommentCountDescViewCountDescWriteDatetimeDesc(sevenDaysAgo);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return GetTop3BoardListResponseDTO.success(boardListViewEntities);
     }
 
     @Override
@@ -77,7 +104,6 @@ public class BoardService implements IBoardService {
 
             resultSets = commentRepository.getCommentList(boardNumber);
             for (int i = 0; i < resultSets.size(); i++) {
-                log.info("리절트 셋 : " + resultSets.get(i).getNickname());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,7 +133,6 @@ public class BoardService implements IBoardService {
                         .build();
                 imageEntities.add(imageEntity);
             }
-            log.info("images : " + imageEntities);
             imageRepository.saveAll(imageEntities);
 
         } catch (Exception e) {

@@ -40,7 +40,6 @@ public class FileService implements IFileService {
 
     @Override
     public String upload(MultipartFile file) throws Exception{
-        log.info(this.getClass().getName() + ".upload Start!!!!");
         log.info(bucket);
         if(file.isEmpty()){
             log.info("FILE 비어있음!!!!!");

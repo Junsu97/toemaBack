@@ -46,8 +46,10 @@ public class BoardListViewEntity {
     @Column(name="COMMENT_COUNT")
     private Long commentCount;
 
+    @Column(name="WRITE_DATETIME")
     private String writeDatetime;
-    private String writerUserId;
+    @Column(name="WRITER_NICKNAME")
     private String writerNickname;
+    @Column(name="WRITER_PROFILE_IMAGE")
     private String writerProfileImage;
 }
