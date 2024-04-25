@@ -30,5 +30,9 @@ public class SearchLogEntity {
     @Column(name = "RELATION")
     private boolean relation;
 
-
+    public SearchLogEntity(String searchWord, String relationWord, boolean relation){
+        this.searchWord = searchWord;
+        this.relationWord = relationWord;
+        this.relation = relation;
+    }
 }

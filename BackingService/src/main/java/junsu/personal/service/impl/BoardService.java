@@ -32,6 +32,7 @@ public class BoardService implements IBoardService {
     private final ImageRepository imageRepository;
     private final FavoriteRepository favoriteRepository;
     private final CommentRepository commentRepository;
+    private final SearchLogRepository searchLogRepository;
     private final BoardListViewRepository boardListViewRepository;
     private final IFileService fileService;
 
@@ -62,6 +63,27 @@ public class BoardService implements IBoardService {
             return ResponseDTO.databaseError();
         }
         return GetLatestBoardListResponseDTO.success(boardListViewEntities);
+    }
+
+    @Override
+    public ResponseEntity<? super GetSearchBoardListResponseDTO> getSearchBoardList(String searchWord, String preSearchWord) {
+        List<BoardListViewEntity> boardListViewEntities = new ArrayList<>();
+        try{
+            boardListViewEntities = boardListViewRepository.findByTitleContainsOrContentContainsOrderByWriteDatetimeDesc(searchWord, searchWord);
+
+            SearchLogEntity searchLogEntity = new SearchLogEntity(searchWord, preSearchWord, false);
+            searchLogRepository.save(searchLogEntity);
+
+            boolean relation = preSearchWord != null;
+            if(relation){
+                searchLogEntity = new SearchLogEntity(preSearchWord, searchWord, relation);
+                searchLogRepository.save(searchLogEntity);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            ResponseDTO.databaseError();
+        }
+        return GetSearchBoardListResponseDTO.success(boardListViewEntities);
     }
 
     @Override

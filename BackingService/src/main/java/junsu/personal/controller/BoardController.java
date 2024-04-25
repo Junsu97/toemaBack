@@ -55,6 +55,16 @@ public class BoardController {
         return response;
     }
 
+    @GetMapping(value={"/search-list/{searchWord}","/search-list/{searchWord}/{preSearchWord}"})
+    public ResponseEntity<? super GetSearchBoardListResponseDTO> getSearchBoardList(
+            @PathVariable("searchWord") String searchWord,
+            @PathVariable(value = "preSearchWord", required = false) String preSearchWord
+    ){
+        ResponseEntity<? super GetSearchBoardListResponseDTO> response = boardService.getSearchBoardList(searchWord,preSearchWord);
+        return response;
+    }
+
+
     @PostMapping("write")
     public ResponseEntity<? super PostBoardRResponseDTO> postBoard(
             @RequestBody @Valid PostBoardRequestDTO requestBody,
