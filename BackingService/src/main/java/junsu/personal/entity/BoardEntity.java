@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import junsu.personal.dto.request.board.PatchBoardRequestDTO;
 import junsu.personal.dto.request.board.PostBoardRequestDTO;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -19,6 +20,7 @@ import java.util.Date;
 @DynamicInsert
 @DynamicUpdate
 @Builder
+@Slf4j
 public class BoardEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -76,6 +78,7 @@ public class BoardEntity {
         this.favoriteCount--;
     }
     public void increaseCommentCount(){
+        log.info("인크리먼트~~");
         this.commentCount++;
     }
     public void decreaseCommentCount(){

@@ -1,11 +1,14 @@
 package junsu.personal.controller;
 
 import junsu.personal.dto.response.user.GetSignInUserResponseDTO;
+import junsu.personal.dto.response.user.GetUserResponseDTO;
 import junsu.personal.service.impl.UserService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/user")
 public class UserController {
     private final UserService userService;
+    @GetMapping("/{userId}")
+    public ResponseEntity<? super GetUserResponseDTO> getUser(@PathVariable("userId") String userId){
+        ResponseEntity<? super GetUserResponseDTO> response = userService.getUser(userId);
+        return response;
+    }
 
     /**
      *

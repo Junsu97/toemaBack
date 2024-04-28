@@ -13,6 +13,7 @@ import junsu.personal.repository.resultSet.GetFavoriteListResultSet;
 import junsu.personal.service.IBoardService;
 import junsu.personal.service.IFileService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BoardService implements IBoardService {
     private final BoardRepository boardRepository;
     private final StudentUserRepository userRepository;
@@ -54,6 +56,22 @@ public class BoardService implements IBoardService {
     }
 
     @Override
+    public ResponseEntity<? super GetUserBoardListResponseDTO> getUserBoardList(String userId) {
+        List<BoardListViewEntity> boardListViewEntities = new ArrayList<>();
+        try{
+            boolean existedUser = userRepository.existsByUserId(userId);
+            if(!existedUser) return GetUserBoardListResponseDTO.noExistUser();
+
+            boardListViewEntities = boardListViewRepository.findByWriterIdOrderByWriteDatetimeDesc(userId);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return GetUserBoardListResponseDTO.success(boardListViewEntities);
+    }
+
+    @Override
     public ResponseEntity<? super GetLatestBoardListResponseDTO> getLatestBoardList() {
         List<BoardListViewEntity> boardListViewEntities = new ArrayList<>();
         try{
@@ -76,7 +94,8 @@ public class BoardService implements IBoardService {
 
             boolean relation = preSearchWord != null;
             if(relation){
-                searchLogEntity = new SearchLogEntity(preSearchWord, searchWord, relation);
+                log.info("트루에용");
+                searchLogEntity = new SearchLogEntity(preSearchWord, searchWord, true);
                 searchLogRepository.save(searchLogEntity);
             }
         }catch (Exception e){
@@ -177,6 +196,7 @@ public class BoardService implements IBoardService {
             commentRepository.save(commentEntity);
 
             boardEntity.increaseCommentCount();
+            boardRepository.save(boardEntity);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();

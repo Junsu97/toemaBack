@@ -64,6 +64,12 @@ public class BoardController {
         return response;
     }
 
+    @GetMapping("/user-board-list/{userId}")
+    public ResponseEntity<? super GetUserBoardListResponseDTO> getUserBoardList(@PathVariable("userId") String userId){
+        ResponseEntity<? super GetUserBoardListResponseDTO> response = boardService.getUserBoardList(userId);
+        return response;
+    }
+
 
     @PostMapping("write")
     public ResponseEntity<? super PostBoardRResponseDTO> postBoard(

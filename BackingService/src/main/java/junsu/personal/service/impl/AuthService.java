@@ -12,6 +12,7 @@ import junsu.personal.provider.JwtProvider;
 import junsu.personal.repository.StudentUserRepository;
 import junsu.personal.repository.TeacherUserRepository;
 import junsu.personal.service.IAuthService;
+import junsu.personal.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -65,8 +66,8 @@ public class AuthService implements IAuthService {
                 StudentUserEntity studentUserEntity = StudentUserEntity.builder()
                         .userId(userId).userName(pDTO.userName())
                         .password(encodedPassword)
-                        .telNumber(telNumber)
-                        .email(email)
+                        .telNumber(EncryptUtil.encAES128CBC(telNumber))
+                        .email(EncryptUtil.encAES128CBC(email))
                         .addr(addr)
                         .addrDetail(addrDetail)
                         .nickname(nickname)

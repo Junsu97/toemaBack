@@ -50,6 +50,9 @@ public class BoardListViewEntity {
     private String writeDatetime;
     @Column(name="WRITER_NICKNAME")
     private String writerNickname;
+
+    @Column(name="WRITER_ID")
+    private String writerId;
     @Column(name="WRITER_PROFILE_IMAGE")
     private String writerProfileImage;
 }
