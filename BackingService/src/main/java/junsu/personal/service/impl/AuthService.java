@@ -83,7 +83,7 @@ public class AuthService implements IAuthService {
                         .telNumber(telNumber)
                         .school(school)
                         .schoolAuth(false)
-                        .email(email)
+                        .email(EncryptUtil.encAES128CBC(email))
                         .addr(addr)
                         .addrDetail(addrDetail)
                         .nickname(nickname)

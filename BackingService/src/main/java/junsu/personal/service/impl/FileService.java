@@ -135,4 +135,9 @@ public class FileService implements IFileService {
         return resource;
     }
 
+    @Override
+    public void profileImageDelete(String url) throws Exception {
+        amazonS3Client.deleteObject(bucket,url);
+    }
+
 }

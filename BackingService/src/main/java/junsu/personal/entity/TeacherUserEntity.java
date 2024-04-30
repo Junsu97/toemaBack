@@ -15,7 +15,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Table(name="TEACHER_USER")
 @DynamicInsert
 @DynamicUpdate
-@Builder
+@Builder(toBuilder = true)
 public class TeacherUserEntity {
     @Id
     @Column(name = "USER_ID")

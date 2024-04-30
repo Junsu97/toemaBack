@@ -15,4 +15,5 @@ public interface StudentUserRepository extends JpaRepository<StudentUserEntity, 
     boolean existsByEmail(String email);
 
     StudentUserEntity findByUserId(String userId);
+    StudentUserEntity findByEmailAndUserName(String email, String userName);
 }

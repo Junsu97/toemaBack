@@ -8,5 +8,6 @@ public interface IFileService {
     int fileDelete(Long boardNumber) throws Exception;
     Resource getImage(String fileName) throws Exception;
 
+    void profileImageDelete(String url) throws Exception;
 
 }

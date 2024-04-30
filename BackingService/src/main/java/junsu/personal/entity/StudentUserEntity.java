@@ -15,7 +15,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Table(name = "STUDENT_USER")
 @DynamicInsert
 @DynamicUpdate
-@Builder
+@Builder(toBuilder = true)
 public class StudentUserEntity {
     @Id
     @Column(name = "USER_ID")
@@ -54,4 +54,7 @@ public class StudentUserEntity {
 
     @Column(name = "ROLE")
     private String role;
+
+
+
 }

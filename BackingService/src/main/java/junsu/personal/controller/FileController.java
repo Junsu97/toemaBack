@@ -22,6 +22,7 @@ public class FileController {
     public String upload(@RequestParam("file") MultipartFile file) {
         String url = null;
         try {
+
             url = fileService.upload(file);
         } catch (Exception e) {
             e.printStackTrace();
