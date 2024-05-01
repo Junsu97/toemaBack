@@ -14,4 +14,5 @@ public interface TeacherUserRepository extends JpaRepository<TeacherUserEntity, 
 
     TeacherUserEntity findByUserId(String userId);
     TeacherUserEntity findByEmailAndUserName(String email, String userName);
+    TeacherUserEntity findByUserIdAndEmailAndUserName(String userId, String email, String userName);
 }

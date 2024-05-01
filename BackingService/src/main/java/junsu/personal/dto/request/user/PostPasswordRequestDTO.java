@@ -4,9 +4,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
 @Builder
-public record PatchAndPostPasswordRequestDTO(
+public record PostPasswordRequestDTO(
         @NotBlank
-        String password,
+        String userId,
+        @NotBlank
+        String userName,
+        @NotBlank
+        String email,
         @NotBlank
         String userType
 ) {

@@ -21,4 +21,9 @@ public class PatchPasswordResponseDTO extends ResponseDTO {
         ResponseDTO result = new ResponseDTO(ResponseCode.NOT_EXISTED_USER, ResponseMessage.NOT_EXISTED_USER);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
     }
+
+    public static ResponseEntity<ResponseDTO> authorizationFail() {
+        ResponseDTO result = new ResponseDTO(ResponseCode.AUTHORIZATION_FAIL, ResponseMessage.AUTHORIZATION_FAIL);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
+    }
 }

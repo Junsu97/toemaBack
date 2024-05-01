@@ -1,21 +1,15 @@
 package junsu.personal.controller;
 
 import jakarta.validation.Valid;
-import junsu.personal.dto.request.user.PatchAndPostPasswordRequestDTO;
-import junsu.personal.dto.request.user.PatchNicknameRequestDTO;
-import junsu.personal.dto.request.user.PatchProfileImageRequestDTO;
-import junsu.personal.dto.request.user.PostFindUserIdRequestDTO;
+import junsu.personal.dto.request.user.*;
 import junsu.personal.dto.response.user.*;
 import junsu.personal.service.IFileService;
 import junsu.personal.service.IUserService;
-import junsu.personal.service.impl.UserService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,7 +49,7 @@ public class UserController {
 
     @PatchMapping("/password")
     public ResponseEntity<? super PatchPasswordResponseDTO> patchPassword(
-            @RequestBody @Valid PatchAndPostPasswordRequestDTO requestBody,
+            @RequestBody @Valid PatchPasswordRequestDTO requestBody,
             @AuthenticationPrincipal String userId
     ) {
         ResponseEntity<? super PatchPasswordResponseDTO> response = userService.patchPassword(requestBody, userId);
@@ -85,11 +79,10 @@ public class UserController {
         return response;
     }
     @PostMapping("/password")
-    public ResponseEntity<? super PostPasswordCheckResponseDTO> postPassword(
-            @RequestBody @Valid PatchAndPostPasswordRequestDTO requestBody,
-            @AuthenticationPrincipal String userId
+    public ResponseEntity<? super PostPasswordResponseDTO> postPassword(
+            @RequestBody @Valid PostPasswordRequestDTO requestBody
     ) {
-        ResponseEntity<? super PostPasswordCheckResponseDTO> response = userService.postPasswordCheck(requestBody, userId);
+        ResponseEntity<? super PostPasswordResponseDTO> response = userService.postPassword(requestBody);
         return response;
     }
 }

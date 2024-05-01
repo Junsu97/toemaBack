@@ -16,4 +16,6 @@ public interface StudentUserRepository extends JpaRepository<StudentUserEntity, 
 
     StudentUserEntity findByUserId(String userId);
     StudentUserEntity findByEmailAndUserName(String email, String userName);
+
+    StudentUserEntity findByUserIdAndEmailAndUserName(String userId, String email, String userName);
 }
