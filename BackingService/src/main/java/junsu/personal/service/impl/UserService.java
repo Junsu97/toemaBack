@@ -1,23 +1,33 @@
 package junsu.personal.service.impl;
 
 import junsu.personal.auth.UserType;
+import junsu.personal.dto.object.MailDTO;
+import junsu.personal.dto.request.user.PostMailReceiveRequestDTO;
+import junsu.personal.dto.request.user.PostMailSendRequestDTO;
 import junsu.personal.dto.request.user.*;
 import junsu.personal.dto.response.ResponseDTO;
+import junsu.personal.dto.response.user.PostMailReceiveResponseDTO;
+import junsu.personal.dto.response.user.PostMailSendResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.dto.response.user.*;
 import junsu.personal.entity.StudentUserEntity;
 import junsu.personal.entity.TeacherUserEntity;
+import junsu.personal.persistance.IMyRedisMapper;
 import junsu.personal.repository.StudentUserRepository;
 import junsu.personal.repository.TeacherUserRepository;
-import junsu.personal.service.IFileService;
 import junsu.personal.service.IUserService;
 import junsu.personal.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +35,10 @@ import org.springframework.stereotype.Service;
 public class UserService implements IUserService {
     private final StudentUserRepository studentUserRepository;
     private final TeacherUserRepository teacherUserRepository;
-    private final IFileService fileService;
+    private final JavaMailSender javaMailSender;
+    private final IMyRedisMapper myRedisMapper;
+    @Value("${spring.mail.username}")
+    private String from;
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
@@ -80,23 +93,29 @@ public class UserService implements IUserService {
     public ResponseEntity<? super PostPasswordResponseDTO> postPassword(PostPasswordRequestDTO pDTO) {
         StudentUserEntity studentUserEntity = null;
         TeacherUserEntity teacherUserEntity = null;
+        MailDTO dto = null;
         String tempPassword = getTempPassword();
         String encodedTempPasswrod = passwordEncoder.encode(tempPassword);
-        try{
+        try {
             String email = EncryptUtil.encAES128CBC(pDTO.email());
-
-            if(pDTO.userType().equals(UserType.STUDENT.getValue())){
+            dto = MailDTO.builder()
+                    .address(pDTO.email())
+                    .title("과외해듀오 임시비밀번호 이메일")
+                    .message("과외해 듀오 임시 비밀번호 : " + tempPassword)
+                    .build();
+            if (pDTO.userType().equals(UserType.STUDENT.getValue())) {
                 studentUserEntity = studentUserRepository.findByUserIdAndEmailAndUserName(pDTO.userId(), email, pDTO.userName());
-                if(studentUserEntity == null) return PostPasswordResponseDTO.notExistUser();
+                if (studentUserEntity == null) return PostPasswordResponseDTO.notExistUser();
                 studentUserEntity = studentUserEntity.toBuilder().password(encodedTempPasswrod).build();
                 studentUserRepository.save(studentUserEntity);
-            }else{
+            } else {
                 teacherUserEntity = teacherUserRepository.findByUserIdAndEmailAndUserName(pDTO.userId(), email, pDTO.userName());
-                if(teacherUserEntity == null) return PostPasswordResponseDTO.notExistUser();
+                if (teacherUserEntity == null) return PostPasswordResponseDTO.notExistUser();
                 teacherUserEntity = teacherUserEntity.toBuilder().password(encodedTempPasswrod).build();
                 teacherUserRepository.save(teacherUserEntity);
             }
-        }catch (Exception e){
+            sendMail(dto);
+        } catch (Exception e) {
             e.printStackTrace();
             ResponseDTO.databaseError();
         }
@@ -104,7 +123,86 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public ResponseEntity<? super GetSignInUserResponseDTO> getSignInUser(String userId) {
+    public ResponseEntity<? super PostMailSendResponseDTO> postMailSend(PostMailSendRequestDTO pDTO) {
+        String title = "과외해듀오 메일 인증 번호";
+        String address = pDTO.email();
+        String message = this.generateAuthNumber();
+        log.info("address : " + address);
+        try {
+            MailDTO mail = new MailDTO(address, title, message);
+            sendMail(mail);
+
+            String redisKey = message + address;
+            myRedisMapper.saveAuth(redisKey, message);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return PostMailSendResponseDTO.success();
+    }
+
+    @Override
+    public ResponseEntity<? super PostMailReceiveResponseDTO> postMailReceive(PostMailReceiveRequestDTO pDTO) {
+        String redisKey = pDTO.code() + pDTO.email();
+        try {
+            String redisAuthCode = myRedisMapper.getAuth(redisKey);
+            if (redisAuthCode == null || !redisAuthCode.equals(pDTO.code())) {
+                return PostMailReceiveResponseDTO.authorizationFail();
+            }
+
+            String encodedEmail = EncryptUtil.encAES128CBC(pDTO.email());
+            if (pDTO.userType().equals(UserType.STUDENT.getValue())) {
+                StudentUserEntity userEntity = studentUserRepository.findByEmail(encodedEmail);
+                if (userEntity == null) {
+                    return PostMailReceiveResponseDTO.notExistUser();
+                }
+                userEntity = userEntity.toBuilder().emailAuth(true).build();
+                studentUserRepository.save(userEntity);
+
+            } else {
+                TeacherUserEntity userEntity = teacherUserRepository.findByEmail(encodedEmail);
+                if (userEntity == null) {
+                    return PostMailReceiveResponseDTO.notExistUser();
+                }
+
+                userEntity = userEntity.toBuilder().schoolAuth(true).build();
+                teacherUserRepository.save(userEntity);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return PostMailReceiveResponseDTO.success();
+    }
+
+    @Override
+    public ResponseEntity<? super PostCheckPasswrodResponseDTO> postCheckPassword(PostCheckPasswordRequestDTO pDTO, String userId) {
+        StudentUserEntity studentUserEntity = null;
+        TeacherUserEntity teacherUserEntity = null;
+        String password = pDTO.password();
+        String userType = pDTO.userType();
+        try {
+            if (userType.equals(UserType.STUDENT.getValue())) {
+                studentUserEntity = studentUserRepository.findByUserId(userId);
+                if (studentUserEntity == null) return PostCheckPasswrodResponseDTO.notExistUser();
+                boolean isMatched = passwordEncoder.matches(password, studentUserEntity.getPassword());
+                if (!isMatched) return PostCheckPasswrodResponseDTO.authorizationFail();
+            } else {
+                teacherUserEntity = teacherUserRepository.findByUserId(userId);
+                if (teacherUserEntity == null) return PostCheckPasswrodResponseDTO.notExistUser();
+                boolean isMatched = passwordEncoder.matches(password, teacherUserEntity.getPassword());
+                if (!isMatched) return PostCheckPasswrodResponseDTO.authorizationFail();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            PostCheckPasswrodResponseDTO.databaseError();
+        }
+        return PostCheckPasswrodResponseDTO.success();
+    }
+
+    @Override
+    public ResponseEntity<? super GetSignInUserResponseDTO> getSignInUser(String userId) throws Exception {
         StudentUserEntity studentUserEntity = null;
         TeacherUserEntity teacherUserEntity = null;
         try {
@@ -112,15 +210,21 @@ public class UserService implements IUserService {
             teacherUserEntity = teacherUserRepository.findByUserId(userId);
 
             if (studentUserEntity == null && teacherUserEntity == null) return GetSignInUserResponseDTO.notExistUser();
-
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }
 
         if (studentUserEntity != null && teacherUserEntity == null) {
+            String email = studentUserEntity.getEmail();
+            String decodeEmail = EncryptUtil.decAES128CBC(email);
+            studentUserEntity = studentUserEntity.toBuilder().email(decodeEmail).build();
             return GetSignInUserResponseDTO.success(studentUserEntity);
         } else {
+            log.info(teacherUserEntity.getAddr());
+            String email = teacherUserEntity.getEmail();
+            String decodeEmail = EncryptUtil.decAES128CBC(email);
+            teacherUserEntity = teacherUserEntity.toBuilder().email(decodeEmail).build();
             return GetSignInUserResponseDTO.success(teacherUserEntity);
         }
 
@@ -167,22 +271,12 @@ public class UserService implements IUserService {
             teacherUserEntity = teacherUserRepository.findByUserId(userId);
             if (studentUserEntity == null && teacherUserEntity == null) return PatchPasswordResponseDTO.notExistUser();
             String userType = pDTO.userType();
-            String password = pDTO.password();
-            String encodedPassword = null;
 
             if (userType.equalsIgnoreCase(UserType.STUDENT.getValue())) {
-                encodedPassword = studentUserEntity.getPassword();
-
-                boolean isMatched = passwordEncoder.matches(password, encodedPassword);
-                if(!isMatched) return PatchPasswordResponseDTO.authorizationFail();
 
                 studentUserEntity = studentUserEntity.toBuilder().password(passwordEncoder.encode(pDTO.newPassword())).build();
                 studentUserRepository.save(studentUserEntity);
             } else {
-                encodedPassword = teacherUserEntity.getPassword();
-
-                boolean isMatched = passwordEncoder.matches(password, encodedPassword);
-                if(!isMatched) return PatchPasswordResponseDTO.authorizationFail();
 
                 teacherUserEntity = teacherUserEntity.toBuilder().password(passwordEncoder.encode(pDTO.newPassword())).build();
                 teacherUserRepository.save(teacherUserEntity);
@@ -226,16 +320,37 @@ public class UserService implements IUserService {
         return PatchProfileImageResponseDTO.success();
     }
 
-    private String getTempPassword(){
-        char[] charSet = new char[] {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+
+    private void sendMail(MailDTO pDTO) {
+        String message = pDTO.message();
+        String title = pDTO.title();
+        String address = pDTO.address();
+
+        log.info("메일 전송");
+        log.info(address);
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(address);
+        mail.setSubject(title);
+        mail.setText(message);
+        mail.setFrom(from);
+        mail.setReplyTo(from);
+        javaMailSender.send(mail);
+    }
+
+    private String getTempPassword() {
+        char[] charSet = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
                 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
         String str = "";
 
         int idx = 0;
-        for(int i = 0; i < 10; i++){
+        for (int i = 0; i < 10; i++) {
             idx = (int) (charSet.length * Math.random());
             str += charSet[idx];
         }
         return str;
+    }
+
+    private String generateAuthNumber() {
+        return String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1000000));
     }
 }

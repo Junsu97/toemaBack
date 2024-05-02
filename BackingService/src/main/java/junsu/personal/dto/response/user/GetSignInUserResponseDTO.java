@@ -12,10 +12,13 @@ import org.springframework.http.ResponseEntity;
 @Getter
 public class GetSignInUserResponseDTO extends ResponseDTO {
     private String userId;
+    private String userName;
     private String email;
     private String nickname;
     private String profileImage;
     private String school;
+    private String addr;
+    private String addrDetail;
     private Boolean schoolAuth;
     private String faceId;
     private String userType;
@@ -23,22 +26,28 @@ public class GetSignInUserResponseDTO extends ResponseDTO {
     private GetSignInUserResponseDTO(StudentUserEntity userEntity){
         super(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
         this.userId = userEntity.getUserId();
+        this.userName = userEntity.getUserName();
         this.email = userEntity.getEmail();
         this.nickname = userEntity.getNickname();
         this.profileImage = userEntity.getProfileImage();
-        this.school = userEntity.getProfileImage();
+        this.school = null;
         this.schoolAuth = null;
+        this.addr = userEntity.getAddr();
+        this.addrDetail = userEntity.getAddrDetail();
         this.faceId = userEntity.getFaceId();
         this.userType = "STUDENT";
     }
     private GetSignInUserResponseDTO(TeacherUserEntity userEntity){
         super(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
         this.userId = userEntity.getUserId();
+        this.userName = userEntity.getUserName();
         this.email = userEntity.getEmail();
         this.nickname = userEntity.getNickname();
         this.profileImage = userEntity.getProfileImage();
-        this.school = userEntity.getProfileImage();
+        this.school = userEntity.getSchool();
         this.schoolAuth = userEntity.getSchoolAuth();
+        this.addr = userEntity.getAddr();
+        this.addrDetail = userEntity.getAddrDetail();
         this.faceId = userEntity.getFaceId();
         this.userType = "TEACHER";
     }

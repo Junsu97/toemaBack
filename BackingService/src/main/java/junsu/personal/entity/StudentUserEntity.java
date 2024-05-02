@@ -32,6 +32,10 @@ public class StudentUserEntity {
     private String email;
 
     @NonNull
+    @Column(name = "EMAIL_AUTH", nullable = false)
+    private boolean emailAuth;
+
+    @NonNull
     @Column(name = "TEL_NUMBER", nullable = false)
     private String telNumber;
 

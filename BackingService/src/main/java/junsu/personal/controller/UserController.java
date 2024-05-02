@@ -34,8 +34,13 @@ public class UserController {
      */
     @GetMapping("")
     private ResponseEntity<? super GetSignInUserResponseDTO> getSignInUser(@AuthenticationPrincipal String userId) {
-        ResponseEntity<? super GetSignInUserResponseDTO> response = userService.getSignInUser(userId);
-        return response;
+        try{
+            ResponseEntity<? super GetSignInUserResponseDTO> response = userService.getSignInUser(userId);
+            return response;
+        }catch (Exception e){
+            e.printStackTrace();
+            return GetSignInUserResponseDTO.databaseError();
+        }
     }
 
     @PatchMapping("/nickname")
@@ -66,6 +71,18 @@ public class UserController {
         return response;
     }
 
+    @PostMapping("/send-mail")
+    public ResponseEntity<? super PostMailSendResponseDTO> postMailSend(@RequestBody PostMailSendRequestDTO requestBody){
+        ResponseEntity<? super PostMailSendResponseDTO> response = userService.postMailSend(requestBody);
+        return response;
+    }
+
+    @PostMapping("/receive-mail")
+    public ResponseEntity<? super PostMailReceiveResponseDTO> postMailReceive(@RequestBody PostMailReceiveRequestDTO requestBody){
+        ResponseEntity<? super PostMailReceiveResponseDTO> resposne = userService.postMailReceive(requestBody);
+        return resposne;
+    }
+
     @PatchMapping("/update/{userId}")
     public ResponseEntity patchUserInfo(){
         return null;
@@ -83,6 +100,15 @@ public class UserController {
             @RequestBody @Valid PostPasswordRequestDTO requestBody
     ) {
         ResponseEntity<? super PostPasswordResponseDTO> response = userService.postPassword(requestBody);
+        return response;
+    }
+
+    @PostMapping("/check-password")
+    public ResponseEntity<? super PostCheckPasswrodResponseDTO> postCheckPassword(
+            @RequestBody @Valid PostCheckPasswordRequestDTO requestBody,
+            @AuthenticationPrincipal String userId
+    ){
+        ResponseEntity<? super PostCheckPasswrodResponseDTO> response = userService.postCheckPassword(requestBody, userId);
         return response;
     }
 }

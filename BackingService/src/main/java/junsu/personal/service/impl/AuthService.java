@@ -68,6 +68,7 @@ public class AuthService implements IAuthService {
                         .password(encodedPassword)
                         .telNumber(EncryptUtil.encAES128CBC(telNumber))
                         .email(EncryptUtil.encAES128CBC(email))
+                        .emailAuth(false)
                         .addr(addr)
                         .addrDetail(addrDetail)
                         .nickname(nickname)

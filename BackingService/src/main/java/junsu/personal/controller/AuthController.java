@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import junsu.personal.dto.request.auth.*;
 import junsu.personal.dto.response.auth.SignInResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
+import junsu.personal.service.IAuthService;
 import junsu.personal.service.impl.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
+    private final IAuthService authService;
 
     @Value("${univCert.api.key}")
     private String univCertAPI;

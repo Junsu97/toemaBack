@@ -15,6 +15,11 @@ spring:
       port: 27017
       username: myUser
       password: 1234
+    redis:
+      host: 192.168.131.133
+      port: 6379
+      username: poly
+      password: 1234
   jpa:
     generate-ddl: false
     hibernate:
@@ -27,6 +32,14 @@ spring:
     properties:
       hibernate.format_sql: true
       hibernate.use_sql_comments: true
+  mail:
+    host: smtp.naver.com
+    port: 465
+    username: wnstn7759@naver.com
+    password: wnstn@110214
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.ssl.enable: true
 
   # MultipartFile
   #------------------------------------
