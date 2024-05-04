@@ -2,19 +2,23 @@ package junsu.personal.service.impl;
 
 import junsu.personal.auth.UserType;
 import junsu.personal.dto.object.MailDTO;
+import junsu.personal.dto.request.auth.DeleteUserRequestDTO;
 import junsu.personal.dto.request.user.PostMailReceiveRequestDTO;
 import junsu.personal.dto.request.user.PostMailSendRequestDTO;
 import junsu.personal.dto.request.user.*;
 import junsu.personal.dto.response.ResponseDTO;
+import junsu.personal.dto.response.auth.DeleteUserResponseDTO;
 import junsu.personal.dto.response.user.PostMailReceiveResponseDTO;
 import junsu.personal.dto.response.user.PostMailSendResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.dto.response.user.*;
+import junsu.personal.entity.BoardEntity;
+import junsu.personal.entity.FavoriteEntity;
 import junsu.personal.entity.StudentUserEntity;
 import junsu.personal.entity.TeacherUserEntity;
 import junsu.personal.persistance.IMyRedisMapper;
-import junsu.personal.repository.StudentUserRepository;
-import junsu.personal.repository.TeacherUserRepository;
+import junsu.personal.repository.*;
+import junsu.personal.service.IFileService;
 import junsu.personal.service.IUserService;
 import junsu.personal.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +31,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -35,6 +40,13 @@ import java.util.concurrent.ThreadLocalRandom;
 public class UserService implements IUserService {
     private final StudentUserRepository studentUserRepository;
     private final TeacherUserRepository teacherUserRepository;
+    private final BoardRepository boardRepository;
+    private final ImageRepository imageRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final CommentRepository commentRepository;
+    private final SearchLogRepository searchLogRepository;
+    private final BoardListViewRepository boardListViewRepository;
+    private final IFileService fileService;
     private final JavaMailSender javaMailSender;
     private final IMyRedisMapper myRedisMapper;
     @Value("${spring.mail.username}")
@@ -126,14 +138,15 @@ public class UserService implements IUserService {
     public ResponseEntity<? super PostMailSendResponseDTO> postMailSend(PostMailSendRequestDTO pDTO) {
         String title = "과외해듀오 메일 인증 번호";
         String address = pDTO.email();
-        String message = this.generateAuthNumber();
+        String code = this.generateAuthNumber();
+        String message = "과외해듀오 메일 인증번호 : " + code;
         log.info("address : " + address);
         try {
             MailDTO mail = new MailDTO(address, title, message);
             sendMail(mail);
 
-            String redisKey = message + address;
-            myRedisMapper.saveAuth(redisKey, message);
+            String redisKey = code + address;
+            myRedisMapper.saveAuth(redisKey, code);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -166,7 +179,7 @@ public class UserService implements IUserService {
                     return PostMailReceiveResponseDTO.notExistUser();
                 }
 
-                userEntity = userEntity.toBuilder().schoolAuth(true).build();
+                userEntity = userEntity.toBuilder().emailAuth(true).build();
                 teacherUserRepository.save(userEntity);
             }
         } catch (Exception e) {
@@ -218,16 +231,50 @@ public class UserService implements IUserService {
         if (studentUserEntity != null && teacherUserEntity == null) {
             String email = studentUserEntity.getEmail();
             String decodeEmail = EncryptUtil.decAES128CBC(email);
-            studentUserEntity = studentUserEntity.toBuilder().email(decodeEmail).build();
+            String decodeTelNum = EncryptUtil.decAES128CBC(studentUserEntity.getTelNumber());
+            studentUserEntity = studentUserEntity.toBuilder().email(decodeEmail).telNumber(decodeTelNum).build();
             return GetSignInUserResponseDTO.success(studentUserEntity);
         } else {
             log.info(teacherUserEntity.getAddr());
             String email = teacherUserEntity.getEmail();
             String decodeEmail = EncryptUtil.decAES128CBC(email);
-            teacherUserEntity = teacherUserEntity.toBuilder().email(decodeEmail).build();
+            String decodeTelNum = EncryptUtil.decAES128CBC(teacherUserEntity.getTelNumber());
+            teacherUserEntity = teacherUserEntity.toBuilder().email(decodeEmail).telNumber(decodeTelNum).build();
             return GetSignInUserResponseDTO.success(teacherUserEntity);
         }
 
+    }
+
+    @Override
+    public ResponseEntity<? super PatchUserResponseDTO> patchUser(PatchUserRequestDTO pDTO, String userId) {
+        try{
+            String school = pDTO.school();
+            if(school == null || school.isEmpty()){
+                school = " ";
+            }
+
+            if(pDTO.userType().equals(UserType.STUDENT.getValue())){
+                StudentUserEntity userEntity = studentUserRepository.findByUserId(userId);
+                userEntity = userEntity.toBuilder()
+                        .addr(pDTO.addr())
+                        .addrDetail(pDTO.addrDetail())
+                        .school(pDTO.school())
+                        .build();
+                studentUserRepository.save(userEntity);
+            }else{
+                TeacherUserEntity userEntity = teacherUserRepository.findByUserId(userId);
+                userEntity = userEntity.toBuilder()
+                        .addr(pDTO.addr())
+                        .addrDetail(pDTO.addrDetail())
+                        .school(pDTO.school())
+                        .build();
+                teacherUserRepository.save(userEntity);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            ResponseDTO.databaseError();
+        }
+        return PatchUserResponseDTO.success();
     }
 
     @Override
@@ -320,6 +367,27 @@ public class UserService implements IUserService {
         return PatchProfileImageResponseDTO.success();
     }
 
+    @Override
+    public ResponseEntity<? super DeleteUserResponseDTO> deleteUser(DeleteUserRequestDTO pDTO, String userId) {
+        try{
+            if(pDTO.userType().equals(UserType.STUDENT.getValue())){
+                List<FavoriteEntity> favoriteEntities = favoriteRepository.findAllByUserId(userId);
+
+                List<BoardEntity> boardEntities = boardRepository.findAllByWriterId(userId);
+                if(boardEntities.size() != 0){
+
+                }
+
+            }else{
+
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return DeleteUserResponseDTO.success();
+    }
+
 
     private void sendMail(MailDTO pDTO) {
         String message = pDTO.message();
@@ -331,6 +399,7 @@ public class UserService implements IUserService {
         SimpleMailMessage mail = new SimpleMailMessage();
         mail.setTo(address);
         mail.setSubject(title);
+        log.info("message : " + message);
         mail.setText(message);
         mail.setFrom(from);
         mail.setReplyTo(from);

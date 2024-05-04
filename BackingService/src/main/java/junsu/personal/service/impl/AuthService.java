@@ -62,7 +62,13 @@ public class AuthService implements IAuthService {
             String role = "ROLE_USER";
             String userType = pDTO.userType();
 
+
             if(userType.equalsIgnoreCase(UserType.STUDENT.getValue())){
+                String school = pDTO.school();
+                if(pDTO.school() == null || pDTO.school().isEmpty()){
+                    school = "";
+                }
+
                 StudentUserEntity studentUserEntity = StudentUserEntity.builder()
                         .userId(userId).userName(pDTO.userName())
                         .password(encodedPassword)
@@ -70,6 +76,7 @@ public class AuthService implements IAuthService {
                         .email(EncryptUtil.encAES128CBC(email))
                         .emailAuth(false)
                         .addr(addr)
+                        .school(school)
                         .addrDetail(addrDetail)
                         .nickname(nickname)
                         .role(role)
@@ -83,7 +90,7 @@ public class AuthService implements IAuthService {
                         .password(encodedPassword)
                         .telNumber(telNumber)
                         .school(school)
-                        .schoolAuth(false)
+                        .emailAuth(false)
                         .email(EncryptUtil.encAES128CBC(email))
                         .addr(addr)
                         .addrDetail(addrDetail)
@@ -106,7 +113,7 @@ public class AuthService implements IAuthService {
             String userId = pDTO.userId();
             TeacherUserEntity entity = TeacherUserEntity.builder()
                     .userId(userId)
-                    .schoolAuth(true).build();
+                    .emailAuth(true).build();
 
             teacherUserRepository.save(entity);
         } catch (Exception e) {

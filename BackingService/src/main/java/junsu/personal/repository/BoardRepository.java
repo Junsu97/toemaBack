@@ -6,11 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
 
     boolean existsByBoardNumber(Long boardNumber);
     BoardEntity findByBoardNumber(Long boardNumber);
+
+    List<BoardEntity> findAllByWriterId(String userId);
 
     @Query(
             value =

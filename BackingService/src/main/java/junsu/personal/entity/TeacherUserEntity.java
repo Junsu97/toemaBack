@@ -32,8 +32,8 @@ public class TeacherUserEntity {
     private String school;
 
     @NonNull
-    @Column(name="SCHOOL_AUTH", nullable = false)
-    private Boolean schoolAuth;
+    @Column(name="EMAIL_AUTH", nullable = false)
+    private Boolean emailAuth;
 
     @NonNull
     @Column(name = "EMAIL", nullable = false)
@@ -62,8 +62,4 @@ public class TeacherUserEntity {
 
     @Column(name = "ROLE")
     private String role;
-
-
-
-
 }

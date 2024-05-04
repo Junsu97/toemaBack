@@ -33,7 +33,7 @@ public class StudentUserEntity {
 
     @NonNull
     @Column(name = "EMAIL_AUTH", nullable = false)
-    private boolean emailAuth;
+    private Boolean emailAuth;
 
     @NonNull
     @Column(name = "TEL_NUMBER", nullable = false)
@@ -51,6 +51,10 @@ public class StudentUserEntity {
     @Column(name="ADDR_DETAIL")
     private String addrDetail;
 
+    @NonNull
+    @Column(name = "SCHOOL")
+    private String school;
+
     @Column(name = "PROFILE_IMAGE")
     private String profileImage;
     @Column(name = "FACE_ID")
@@ -58,7 +62,4 @@ public class StudentUserEntity {
 
     @Column(name = "ROLE")
     private String role;
-
-
-
 }

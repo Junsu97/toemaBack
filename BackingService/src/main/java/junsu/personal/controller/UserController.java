@@ -71,6 +71,15 @@ public class UserController {
         return response;
     }
 
+    @PatchMapping("/edit-user")
+    public ResponseEntity<? super PatchUserResponseDTO> patchUSer(
+            @RequestBody @Valid PatchUserRequestDTO requestBody,
+            @AuthenticationPrincipal String userId
+    ){
+        ResponseEntity<? super PatchUserResponseDTO> response = userService.patchUser(requestBody, userId);
+        return response;
+    }
+
     @PostMapping("/send-mail")
     public ResponseEntity<? super PostMailSendResponseDTO> postMailSend(@RequestBody PostMailSendRequestDTO requestBody){
         ResponseEntity<? super PostMailSendResponseDTO> response = userService.postMailSend(requestBody);

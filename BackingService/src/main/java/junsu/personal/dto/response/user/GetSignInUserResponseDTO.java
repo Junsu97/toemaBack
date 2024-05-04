@@ -17,9 +17,10 @@ public class GetSignInUserResponseDTO extends ResponseDTO {
     private String nickname;
     private String profileImage;
     private String school;
+    private String telNumber;
     private String addr;
     private String addrDetail;
-    private Boolean schoolAuth;
+    private Boolean emailAuth;
     private String faceId;
     private String userType;
 
@@ -30,8 +31,9 @@ public class GetSignInUserResponseDTO extends ResponseDTO {
         this.email = userEntity.getEmail();
         this.nickname = userEntity.getNickname();
         this.profileImage = userEntity.getProfileImage();
-        this.school = null;
-        this.schoolAuth = null;
+        this.school = userEntity.getSchool();
+        this.emailAuth = userEntity.getEmailAuth();
+        this.telNumber = userEntity.getTelNumber();
         this.addr = userEntity.getAddr();
         this.addrDetail = userEntity.getAddrDetail();
         this.faceId = userEntity.getFaceId();
@@ -45,7 +47,8 @@ public class GetSignInUserResponseDTO extends ResponseDTO {
         this.nickname = userEntity.getNickname();
         this.profileImage = userEntity.getProfileImage();
         this.school = userEntity.getSchool();
-        this.schoolAuth = userEntity.getSchoolAuth();
+        this.emailAuth = userEntity.getEmailAuth();
+        this.telNumber = userEntity.getTelNumber();
         this.addr = userEntity.getAddr();
         this.addrDetail = userEntity.getAddrDetail();
         this.faceId = userEntity.getFaceId();
