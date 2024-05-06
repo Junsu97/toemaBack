@@ -1,4 +1,4 @@
-package junsu.personal.dto.request.faceId.object;
+package junsu.personal.dto.request.auth.faceId.object;
 
 public record Expressions(
         double neutral,

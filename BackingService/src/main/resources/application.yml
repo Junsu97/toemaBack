@@ -10,11 +10,13 @@ spring:
     password: 1234
   data:
     mongodb:
-      host: 192.168.131.133
+      uri: mongodb+srv://junsoo971230:pPsSA0MJOwcc4z6p@faceid.k9wruxl.mongodb.net/?retryWrites=true&w=majority&appName=FaceID
+    #      host: 172.31.45.121
+#      port: 27017
       database: MyDB
-      port: 27017
-      username: myUser
-      password: 1234
+#      username: myUser
+#      password: 1234
+
     redis:
       host: 192.168.131.133
       port: 6379

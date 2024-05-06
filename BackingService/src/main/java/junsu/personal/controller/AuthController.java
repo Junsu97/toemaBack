@@ -5,8 +5,10 @@ import com.univcert.api.UnivCert;
 import io.swagger.annotations.ApiOperation;
 import jakarta.validation.Valid;
 import junsu.personal.dto.request.auth.*;
+import junsu.personal.dto.request.auth.faceId.PostFaceIDRequestDTO;
 import junsu.personal.dto.response.auth.SignInResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
+import junsu.personal.dto.response.auth.faceId.PostFaceIdResponseDTO;
 import junsu.personal.service.IAuthService;
 import junsu.personal.service.impl.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +46,13 @@ public class AuthController {
         return response;
     }
 
+    @PostMapping("face-id")
+    public ResponseEntity<? super PostFaceIdResponseDTO> postFaceId(@RequestBody @Valid PostFaceIDRequestDTO requestBody){
+
+        ResponseEntity<? super PostFaceIdResponseDTO> response = authService.postFaceId(requestBody);
+        return response;
+    }
+
     //대학메일 인증
     @PostMapping(value = "/validation/teacher/mail/send")
     public JSONObject sendUnivCertMain(@RequestBody @Valid MailDTO mailDTO) throws Exception{
@@ -56,6 +66,8 @@ public class AuthController {
         Map<String, Object> response = UnivCert.certify(univCertAPI, mailDTO.univName(), mailDTO.email(), false);
         return new JSONObject(response);
     }
+
+
 
     @ApiOperation(value = "인증코드 입력", notes = "인증코드 필수, 1000~9999의 인증번호 양식 준수 \n"+
             "success : true면 끝")

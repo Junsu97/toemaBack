@@ -1,8 +1,10 @@
 package junsu.personal.persistance;
 
-import junsu.personal.dto.request.faceId.PostFaceIDRequestDTO;
+import junsu.personal.dto.request.auth.faceId.PostFaceIDRequestDTO;
+
+import java.util.List;
 
 public interface IMongoMapper {
 
-    int insertData(PostFaceIDRequestDTO pDTO, String colNm) throws Exception;
+    int insertFaceId(PostFaceIDRequestDTO pDTO) throws Exception;
 }

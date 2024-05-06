@@ -3,11 +3,14 @@ package junsu.personal.service.impl;
 import junsu.personal.auth.UserRole;
 import junsu.personal.auth.UserType;
 import junsu.personal.dto.request.auth.*;
+import junsu.personal.dto.request.auth.faceId.PostFaceIDRequestDTO;
 import junsu.personal.dto.response.ResponseDTO;
 import junsu.personal.dto.response.auth.SignInResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
+import junsu.personal.dto.response.auth.faceId.PostFaceIdResponseDTO;
 import junsu.personal.entity.StudentUserEntity;
 import junsu.personal.entity.TeacherUserEntity;
+import junsu.personal.persistance.IMongoMapper;
 import junsu.personal.provider.JwtProvider;
 import junsu.personal.repository.StudentUserRepository;
 import junsu.personal.repository.TeacherUserRepository;
@@ -20,12 +23,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService implements IAuthService {
     private final StudentUserRepository studentUserRepository;
     private final TeacherUserRepository teacherUserRepository;
+    private final IMongoMapper mongoMapper;
     private final JwtProvider jwtProvider;
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -165,6 +171,23 @@ public class AuthService implements IAuthService {
         }
 
         return SignInResponseDTO.success(token);
+    }
+
+    @Override
+    public ResponseEntity<? super PostFaceIdResponseDTO> postFaceId(PostFaceIDRequestDTO pDTO) {
+        try{
+            log.info("FaceID 등록을 위한 UserID : " + pDTO.userId());
+            int res = mongoMapper.insertFaceId(pDTO);
+
+            if(res != 1){
+                ResponseDTO.databaseError();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            ResponseDTO.databaseError();
+        }
+
+        return PostFaceIdResponseDTO.success();
     }
 
 
