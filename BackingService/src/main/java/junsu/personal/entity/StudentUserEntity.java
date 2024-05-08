@@ -58,7 +58,7 @@ public class StudentUserEntity {
     @Column(name = "PROFILE_IMAGE")
     private String profileImage;
     @Column(name = "FACE_ID")
-    private String faceId;
+    private Boolean faceId;
 
     @Column(name = "ROLE")
     private String role;

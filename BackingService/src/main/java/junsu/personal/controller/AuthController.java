@@ -1,22 +1,20 @@
 package junsu.personal.controller;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.univcert.api.UnivCert;
 import io.swagger.annotations.ApiOperation;
 import jakarta.validation.Valid;
 import junsu.personal.dto.request.auth.*;
 import junsu.personal.dto.request.auth.faceId.PostFaceIDRequestDTO;
+import junsu.personal.dto.request.auth.faceId.PostFaceIdSignInRequestDTO;
 import junsu.personal.dto.response.auth.SignInResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.dto.response.auth.faceId.PostFaceIdResponseDTO;
+import junsu.personal.dto.response.auth.faceId.PostFaceIdSignInResponseDTO;
 import junsu.personal.service.IAuthService;
-import junsu.personal.service.impl.AuthService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +41,12 @@ public class AuthController {
     @PostMapping("/sign-up")
     public ResponseEntity<? super SignUpResponseDTO> signUp(@RequestBody @Valid SignUpRequestDTO requestBody){
         ResponseEntity<? super SignUpResponseDTO> response = authService.signUp(requestBody);
+        return response;
+    }
+
+    @PostMapping("/face-sign-in")
+    public ResponseEntity<? super PostFaceIdSignInResponseDTO> faceIdSignIn(@RequestBody @Valid PostFaceIdSignInRequestDTO requestBody){
+        ResponseEntity<? super PostFaceIdSignInResponseDTO> response = authService.faceIdSignIn(requestBody);
         return response;
     }
 

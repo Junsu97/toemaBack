@@ -3,9 +3,11 @@ package junsu.personal.dto.response.auth.faceId;
 import junsu.personal.common.ResponseCode;
 import junsu.personal.common.ResponseMessage;
 import junsu.personal.dto.response.ResponseDTO;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+@Getter
 public class PostFaceIdResponseDTO extends ResponseDTO {
     private PostFaceIdResponseDTO(){
         super(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);

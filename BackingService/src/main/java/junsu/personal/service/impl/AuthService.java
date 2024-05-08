@@ -4,14 +4,24 @@ import junsu.personal.auth.UserRole;
 import junsu.personal.auth.UserType;
 import junsu.personal.dto.request.auth.*;
 import junsu.personal.dto.request.auth.faceId.PostFaceIDRequestDTO;
+import junsu.personal.dto.request.auth.faceId.PostFaceIdSignInRequestDTO;
+import junsu.personal.dto.request.auth.faceId.object.LandMark;
+import junsu.personal.dto.request.auth.faceId.object.Position;
 import junsu.personal.dto.response.ResponseDTO;
 import junsu.personal.dto.response.auth.SignInResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.dto.response.auth.faceId.PostFaceIdResponseDTO;
+import junsu.personal.dto.response.auth.faceId.PostFaceIdSignInResponseDTO;
 import junsu.personal.entity.StudentUserEntity;
 import junsu.personal.entity.TeacherUserEntity;
+import junsu.personal.entity.domain.StudentFaceIdDomain;
+import junsu.personal.entity.domain.TeacherFaceIdDomain;
 import junsu.personal.persistance.IMongoMapper;
 import junsu.personal.provider.JwtProvider;
+import junsu.personal.repository.StudentFaceIdViewRepository;
+import junsu.personal.repository.TeacherFaceIdViewRepository;
+import junsu.personal.repository.mongo.MongoStudentFaceIdRepository;
+import junsu.personal.repository.mongo.MongoTeacherFaceIdRepository;
 import junsu.personal.repository.StudentUserRepository;
 import junsu.personal.repository.TeacherUserRepository;
 import junsu.personal.service.IAuthService;
@@ -30,7 +40,11 @@ import java.util.List;
 @Slf4j
 public class AuthService implements IAuthService {
     private final StudentUserRepository studentUserRepository;
+    private final StudentFaceIdViewRepository studentFaceIdViewRepository;
+    private final TeacherFaceIdViewRepository teacherFaceIdViewRepository;
     private final TeacherUserRepository teacherUserRepository;
+    private final MongoStudentFaceIdRepository mongoStudentFaceIdRepository;
+    private final MongoTeacherFaceIdRepository mongoTeacherFaceIdRepository;
     private final IMongoMapper mongoMapper;
     private final JwtProvider jwtProvider;
 
@@ -39,7 +53,7 @@ public class AuthService implements IAuthService {
 
     @Override
     public ResponseEntity<? super SignUpResponseDTO> signUp(SignUpRequestDTO pDTO) {
-        try{
+        try {
             String userId = pDTO.userId();
             boolean existedStudentUserId = studentUserRepository.existsByUserId(userId);
             boolean existedTeacherUserId = teacherUserRepository.existsByUserId(userId);
@@ -69,9 +83,9 @@ public class AuthService implements IAuthService {
             String userType = pDTO.userType();
 
 
-            if(userType.equalsIgnoreCase(UserType.STUDENT.getValue())){
+            if (userType.equalsIgnoreCase(UserType.STUDENT.getValue())) {
                 String school = pDTO.school();
-                if(pDTO.school() == null || pDTO.school().isEmpty()){
+                if (pDTO.school() == null || pDTO.school().isEmpty()) {
                     school = "";
                 }
 
@@ -89,7 +103,7 @@ public class AuthService implements IAuthService {
                         .build();
 
                 studentUserRepository.save(studentUserEntity);
-            }else{
+            } else {
                 String school = pDTO.school();
                 TeacherUserEntity teacherUserEntity = TeacherUserEntity.builder()
                         .userId(userId).userName(pDTO.userName())
@@ -107,12 +121,13 @@ public class AuthService implements IAuthService {
 
                 teacherUserRepository.save(teacherUserEntity);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }
         return SignUpResponseDTO.success();
     }
+
     @Override
     public ResponseEntity<? super SignUpResponseDTO> validateUnivEmail(MailDTO pDTO) {
         try {
@@ -174,15 +189,75 @@ public class AuthService implements IAuthService {
     }
 
     @Override
+    public ResponseEntity<? super PostFaceIdSignInResponseDTO> faceIdSignIn(PostFaceIdSignInRequestDTO pDTO) {
+        String token = null;
+        String userType = pDTO.userType();
+        double threshold  = 0.05;
+        LandMark landMarks = pDTO.landMarks();
+        double minDistance =Double.MAX_VALUE;
+        String userId = "";
+        try {
+            if (userType.equals(UserType.STUDENT.getValue())) {
+                List<StudentFaceIdDomain> faceIdDomains = mongoStudentFaceIdRepository.findAll();
+
+                for(StudentFaceIdDomain domain : faceIdDomains){
+                    double distance = calculateDifference(landMarks, domain.getLandMarks());
+                    if(distance < minDistance){
+                        minDistance = distance;
+                        if(Math.abs(minDistance) < threshold){
+                            userId = domain.getUserId();
+                        }
+                    }
+                }
+
+            } else {
+                List<TeacherFaceIdDomain> faceIdDomains = mongoTeacherFaceIdRepository.findAll();
+
+                for(TeacherFaceIdDomain domain : faceIdDomains){
+                    double distance = calculateDifference(landMarks, domain.getLandMarks());
+                    if(distance < minDistance){
+                        minDistance = distance;
+                        if(Math.abs(minDistance) < threshold){
+                            userId = domain.getUserId();
+                        }
+                    }
+
+                }
+            }
+            if(!userId.isEmpty()){
+                token = jwtProvider.create(userId, UserRole.USER.getValue(), userType);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            ResponseDTO.databaseError();
+        }
+        if(!userId.isEmpty()){
+            return PostFaceIdSignInResponseDTO.success(token);
+        }else{
+            return PostFaceIdSignInResponseDTO.signInFailed();
+        }
+    }
+
+    @Override
     public ResponseEntity<? super PostFaceIdResponseDTO> postFaceId(PostFaceIDRequestDTO pDTO) {
-        try{
+        try {
             log.info("FaceID 등록을 위한 UserID : " + pDTO.userId());
             int res = mongoMapper.insertFaceId(pDTO);
 
-            if(res != 1){
+            if (res != 1) {
                 ResponseDTO.databaseError();
             }
-        }catch (Exception e){
+
+            if (pDTO.userType().equals(UserType.STUDENT.getValue())) {
+                StudentUserEntity userEntity = studentUserRepository.findByUserId(pDTO.userId());
+                userEntity = userEntity.toBuilder().faceId(true).build();
+                studentUserRepository.save(userEntity);
+            } else {
+                TeacherUserEntity userEntity = teacherUserRepository.findByUserId(pDTO.userId());
+                userEntity = userEntity.toBuilder().faceId(true).build();
+                teacherUserRepository.save(userEntity);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             ResponseDTO.databaseError();
         }
@@ -190,5 +265,23 @@ public class AuthService implements IAuthService {
         return PostFaceIdResponseDTO.success();
     }
 
+    private double calculateDifference(LandMark landMark1, LandMark landMark2){
+        List<Position> totalPos1 = landMark1.positions();
+        List<Position> totalPos2 = landMark2.positions();
 
+        double totalDifference = 0.0;
+
+        int numPos = totalPos1.size();
+
+        for(int i = 0; i < numPos; i++){
+            Position pos1 = totalPos1.get(i);
+            Position pos2 = totalPos2.get(i);
+
+            // 유클리드 거리를 사용하여 두 포지션 사이의 거리 차이 계산
+            double distance = Math.sqrt(Math.pow(pos1.x() - pos2.x(),2) + Math.pow(pos1.y() - pos2.y(), 2));
+            totalDifference += distance;
+        }
+
+        return totalDifference;
+    }
 }

@@ -15,5 +15,12 @@
       <jdbc-url>mongodb+srv://faceid.k9wruxl.mongodb.net/</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="@192.168.131.133" uuid="f9eb8d0f-d2e7-44ec-b934-561c44ec500e">
+      <driver-ref>redis</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>jdbc.RedisDriver</jdbc-driver>
+      <jdbc-url>jdbc:redis://192.168.131.133:6379</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

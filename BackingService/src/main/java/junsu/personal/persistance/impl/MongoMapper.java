@@ -2,7 +2,9 @@ package junsu.personal.persistance.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
+import junsu.personal.auth.UserType;
 import junsu.personal.dto.request.auth.faceId.PostFaceIDRequestDTO;
+import junsu.personal.dto.request.auth.faceId.PostFaceIdSignInRequestDTO;
 import junsu.personal.persistance.AbstractMongoDBCommon;
 import junsu.personal.persistance.IMongoMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +26,9 @@ public class MongoMapper extends AbstractMongoDBCommon implements IMongoMapper {
     public int insertFaceId(PostFaceIDRequestDTO pDTO) throws Exception {
         log.info(this.getClass().getName() + ".insertFaceId Start!!!");
         int res = 0;
+        String colName = pDTO.userType().equals(UserType.STUDENT.getValue())? "STUDENT" : "TEACHER";
 
-        MongoCollection<Document> col = mongodb.getCollection("FaceID");
+        MongoCollection<Document> col = mongodb.getCollection(colName);
         col.insertOne(new Document(new ObjectMapper().convertValue(pDTO, Map.class)));
 
         res = 1;

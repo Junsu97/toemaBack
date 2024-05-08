@@ -21,7 +21,7 @@ public class GetSignInUserResponseDTO extends ResponseDTO {
     private String addr;
     private String addrDetail;
     private Boolean emailAuth;
-    private String faceId;
+    private Boolean faceId;
     private String userType;
 
     private GetSignInUserResponseDTO(StudentUserEntity userEntity){
