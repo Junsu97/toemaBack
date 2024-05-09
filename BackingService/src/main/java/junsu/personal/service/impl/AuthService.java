@@ -192,18 +192,23 @@ public class AuthService implements IAuthService {
     public ResponseEntity<? super PostFaceIdSignInResponseDTO> faceIdSignIn(PostFaceIdSignInRequestDTO pDTO) {
         String token = null;
         String userType = pDTO.userType();
-        double threshold  = 0.05;
+        double threshold  = 40;
         LandMark landMarks = pDTO.landMarks();
         double minDistance =Double.MAX_VALUE;
         String userId = "";
         try {
             if (userType.equals(UserType.STUDENT.getValue())) {
                 List<StudentFaceIdDomain> faceIdDomains = mongoStudentFaceIdRepository.findAll();
-
+                log.info("faceIdDomains 사이즈" + faceIdDomains.size());
+                log.info("findAll 끝");
                 for(StudentFaceIdDomain domain : faceIdDomains){
+                    log.info("faceIdDomains values : " + domain.getAccuracy());
+                    log.info("faceIdDomains values : " + domain.getLandMarks());
                     double distance = calculateDifference(landMarks, domain.getLandMarks());
+                    log.info("distance : " + distance);
                     if(distance < minDistance){
                         minDistance = distance;
+                        log.info("minDistance : " + minDistance);
                         if(Math.abs(minDistance) < threshold){
                             userId = domain.getUserId();
                         }
@@ -217,6 +222,7 @@ public class AuthService implements IAuthService {
                     double distance = calculateDifference(landMarks, domain.getLandMarks());
                     if(distance < minDistance){
                         minDistance = distance;
+                        log.info("minDistance : " + minDistance);
                         if(Math.abs(minDistance) < threshold){
                             userId = domain.getUserId();
                         }
@@ -226,6 +232,9 @@ public class AuthService implements IAuthService {
             }
             if(!userId.isEmpty()){
                 token = jwtProvider.create(userId, UserRole.USER.getValue(), userType);
+            }else{
+                return PostFaceIdSignInResponseDTO.signInFailed();
+
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -265,7 +274,7 @@ public class AuthService implements IAuthService {
         return PostFaceIdResponseDTO.success();
     }
 
-    private double calculateDifference(LandMark landMark1, LandMark landMark2){
+    private static double calculateDifference(LandMark landMark1, LandMark landMark2){
         List<Position> totalPos1 = landMark1.positions();
         List<Position> totalPos2 = landMark2.positions();
 
@@ -276,12 +285,12 @@ public class AuthService implements IAuthService {
         for(int i = 0; i < numPos; i++){
             Position pos1 = totalPos1.get(i);
             Position pos2 = totalPos2.get(i);
-
             // 유클리드 거리를 사용하여 두 포지션 사이의 거리 차이 계산
             double distance = Math.sqrt(Math.pow(pos1.x() - pos2.x(),2) + Math.pow(pos1.y() - pos2.y(), 2));
             totalDifference += distance;
+
         }
 
-        return totalDifference;
+        return totalDifference / totalPos1.size();
     }
 }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collation = "TEACHER")
+@Document(collection = "TEACHER")
 @Getter
 @NoArgsConstructor
 public class TeacherFaceIdDomain {

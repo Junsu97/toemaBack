@@ -12,6 +12,7 @@ import junsu.personal.dto.response.auth.faceId.PostFaceIdResponseDTO;
 import junsu.personal.dto.response.auth.faceId.PostFaceIdSignInResponseDTO;
 import junsu.personal.service.IAuthService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
     private final IAuthService authService;
 
@@ -46,7 +48,9 @@ public class AuthController {
 
     @PostMapping("/face-sign-in")
     public ResponseEntity<? super PostFaceIdSignInResponseDTO> faceIdSignIn(@RequestBody @Valid PostFaceIdSignInRequestDTO requestBody){
+        log.info(this.getClass().getName() + ".faceIdSignIn Start!!!!");
         ResponseEntity<? super PostFaceIdSignInResponseDTO> response = authService.faceIdSignIn(requestBody);
+        log.info(this.getClass().getName() + ".faceIdSignIn End!!!!");
         return response;
     }
 
