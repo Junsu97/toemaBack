@@ -10,6 +10,18 @@ public record PatchUserRequestDTO(
         String addrDetail,
         String school,
         @NotBlank
-        String userType
+        String userType,
+
+        Boolean korean,
+
+        Boolean math,
+
+        Boolean science,
+
+        Boolean social,
+
+        Boolean english,
+        String desc
+
 ) {
 }

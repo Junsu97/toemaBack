@@ -29,7 +29,6 @@ public record SignUpRequestDTO(
         @NotNull
         Boolean agreedPersonal,
         String faceId,
-
         @NotBlank
         String userType
 ) {

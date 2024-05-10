@@ -7,6 +7,7 @@ import junsu.personal.dto.response.auth.SignInResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.dto.response.auth.faceId.PostFaceIdResponseDTO;
 import junsu.personal.dto.response.auth.faceId.PostFaceIdSignInResponseDTO;
+import junsu.personal.dto.response.user.GetTeacherSubjectResponseDTO;
 import org.springframework.http.ResponseEntity;
 
 public interface IAuthService {
@@ -18,5 +19,6 @@ public interface IAuthService {
     ResponseEntity<? super PostFaceIdSignInResponseDTO> faceIdSignIn(PostFaceIdSignInRequestDTO pDTO);
 
     ResponseEntity<? super PostFaceIdResponseDTO> postFaceId(PostFaceIDRequestDTO pDTO);
+
 
 }

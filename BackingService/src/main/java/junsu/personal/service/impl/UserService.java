@@ -12,10 +12,7 @@ import junsu.personal.dto.response.user.PostMailReceiveResponseDTO;
 import junsu.personal.dto.response.user.PostMailSendResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.dto.response.user.*;
-import junsu.personal.entity.BoardEntity;
-import junsu.personal.entity.FavoriteEntity;
-import junsu.personal.entity.StudentUserEntity;
-import junsu.personal.entity.TeacherUserEntity;
+import junsu.personal.entity.*;
 import junsu.personal.persistance.IMyRedisMapper;
 import junsu.personal.repository.*;
 import junsu.personal.service.IFileService;
@@ -40,6 +37,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class UserService implements IUserService {
     private final StudentUserRepository studentUserRepository;
     private final TeacherUserRepository teacherUserRepository;
+    private final TeacherSubjectRepository teacherSubjectRepository;
     private final BoardRepository boardRepository;
     private final ImageRepository imageRepository;
     private final FavoriteRepository favoriteRepository;
@@ -72,6 +70,19 @@ public class UserService implements IUserService {
         } else {
             return GetUserResponseDTO.success(teacherUserEntity);
         }
+    }
+    @Override
+    public ResponseEntity<? super GetTeacherSubjectResponseDTO> getTeacherSubject(String userId) {
+        TeacherSubjectEntity subjectEntity = new TeacherSubjectEntity();
+        try{
+            subjectEntity = teacherSubjectRepository.findByUserId(userId);
+            if(subjectEntity == null) return GetTeacherSubjectResponseDTO.noExistUser();
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return GetTeacherSubjectResponseDTO.success(subjectEntity);
     }
 
     @Override
@@ -245,6 +256,7 @@ public class UserService implements IUserService {
 
     }
 
+
     @Override
     public ResponseEntity<? super PatchUserResponseDTO> patchUser(PatchUserRequestDTO pDTO, String userId) {
         try{
@@ -268,7 +280,17 @@ public class UserService implements IUserService {
                         .addrDetail(pDTO.addrDetail())
                         .school(pDTO.school())
                         .build();
+                TeacherSubjectEntity subjectEntity = teacherSubjectRepository.findByUserId(userId);
+                subjectEntity = subjectEntity.toBuilder()
+                        .korean(pDTO.korean())
+                        .math(pDTO.math())
+                        .social(pDTO.social())
+                        .science(pDTO.science())
+                        .english(pDTO.english())
+                        .desc(pDTO.desc())
+                        .build();
                 teacherUserRepository.save(userEntity);
+                teacherSubjectRepository.save(subjectEntity);
             }
         }catch (Exception e){
             e.printStackTrace();

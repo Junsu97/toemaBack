@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface IUserService {
     ResponseEntity<? super GetUserResponseDTO> getUser(String userId);
+    ResponseEntity<? super GetTeacherSubjectResponseDTO> getTeacherSubject(String userId);
     ResponseEntity<? super PostFindUserIdResponseDTO> postFindUserId(PostFindUserIdRequestDTO pDTO);
     ResponseEntity<? super PostPasswordResponseDTO> postPassword(PostPasswordRequestDTO pDTO);
     ResponseEntity<? super PostMailSendResponseDTO> postMailSend(PostMailSendRequestDTO pDTO);

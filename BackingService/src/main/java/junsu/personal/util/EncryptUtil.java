@@ -110,7 +110,7 @@ public class EncryptUtil {
             InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 
         byte[] textBytes = Base64.decodeBase64(str);
-        // byte[] textBytes = str.getBytes("UTF-8");
+//         byte[] textBytes = str.getBytes("UTF-8");
         AlgorithmParameterSpec ivSpec = new IvParameterSpec(ivBytes);
         SecretKeySpec newKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");

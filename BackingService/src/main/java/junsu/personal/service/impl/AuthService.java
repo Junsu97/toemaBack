@@ -12,18 +12,17 @@ import junsu.personal.dto.response.auth.SignInResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.dto.response.auth.faceId.PostFaceIdResponseDTO;
 import junsu.personal.dto.response.auth.faceId.PostFaceIdSignInResponseDTO;
+import junsu.personal.dto.response.user.GetTeacherSubjectResponseDTO;
 import junsu.personal.entity.StudentUserEntity;
+import junsu.personal.entity.TeacherSubjectEntity;
 import junsu.personal.entity.TeacherUserEntity;
 import junsu.personal.entity.domain.StudentFaceIdDomain;
 import junsu.personal.entity.domain.TeacherFaceIdDomain;
 import junsu.personal.persistance.IMongoMapper;
 import junsu.personal.provider.JwtProvider;
-import junsu.personal.repository.StudentFaceIdViewRepository;
-import junsu.personal.repository.TeacherFaceIdViewRepository;
+import junsu.personal.repository.*;
 import junsu.personal.repository.mongo.MongoStudentFaceIdRepository;
 import junsu.personal.repository.mongo.MongoTeacherFaceIdRepository;
-import junsu.personal.repository.StudentUserRepository;
-import junsu.personal.repository.TeacherUserRepository;
 import junsu.personal.service.IAuthService;
 import junsu.personal.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +39,7 @@ import java.util.List;
 @Slf4j
 public class AuthService implements IAuthService {
     private final StudentUserRepository studentUserRepository;
-    private final StudentFaceIdViewRepository studentFaceIdViewRepository;
-    private final TeacherFaceIdViewRepository teacherFaceIdViewRepository;
+    private final TeacherSubjectRepository teacherSubjectRepository;
     private final TeacherUserRepository teacherUserRepository;
     private final MongoStudentFaceIdRepository mongoStudentFaceIdRepository;
     private final MongoTeacherFaceIdRepository mongoTeacherFaceIdRepository;
@@ -108,7 +106,7 @@ public class AuthService implements IAuthService {
                 TeacherUserEntity teacherUserEntity = TeacherUserEntity.builder()
                         .userId(userId).userName(pDTO.userName())
                         .password(encodedPassword)
-                        .telNumber(telNumber)
+                        .telNumber(EncryptUtil.encAES128CBC(telNumber))
                         .school(school)
                         .emailAuth(false)
                         .email(EncryptUtil.encAES128CBC(email))
@@ -116,9 +114,13 @@ public class AuthService implements IAuthService {
                         .addrDetail(addrDetail)
                         .nickname(nickname)
                         .role(role)
-
                         .build();
 
+                TeacherSubjectEntity subjectEntity = TeacherSubjectEntity.builder()
+                        .userId(userId)
+                        .desc("")
+                        .build();
+                teacherSubjectRepository.save(subjectEntity);
                 teacherUserRepository.save(teacherUserEntity);
             }
         } catch (Exception e) {
@@ -273,6 +275,7 @@ public class AuthService implements IAuthService {
 
         return PostFaceIdResponseDTO.success();
     }
+
 
     private static double calculateDifference(LandMark landMark1, LandMark landMark2){
         List<Position> totalPos1 = landMark1.positions();

@@ -43,6 +43,17 @@ public class UserController {
         }
     }
 
+    @GetMapping("/subject")
+    private ResponseEntity<? super GetTeacherSubjectResponseDTO> getTeacherSubject(String userId) {
+        try{
+            ResponseEntity<? super GetTeacherSubjectResponseDTO> response = userService.getTeacherSubject(userId);
+            return response;
+        }catch (Exception e){
+            e.printStackTrace();
+            return GetTeacherSubjectResponseDTO.databaseError();
+        }
+    }
+
     @PatchMapping("/nickname")
     public ResponseEntity<? super PatchNicknameResponseDTO> patchNickname(
             @RequestBody @Valid PatchNicknameRequestDTO requestBody,
