@@ -2,10 +2,20 @@ package junsu.personal.service.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import junsu.personal.dto.request.teacher.PostApplyTeacherRequestDTO;
 import junsu.personal.dto.response.ResponseDTO;
 import junsu.personal.dto.response.teacher.GetTeacherListResponseDTO;
+import junsu.personal.dto.response.teacher.PostApplyTeacherResponseDTO;
+import junsu.personal.entity.MatchEntity;
 import junsu.personal.entity.TeacherSubjectEntity;
+import junsu.personal.entity.TeacherUserEntity;
+import junsu.personal.repository.MatchRepository;
 import junsu.personal.repository.TeacherSubjectRepository;
+import junsu.personal.repository.TeacherUserRepository;
 import junsu.personal.service.ITeacherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,30 +30,43 @@ import java.util.List;
 @Slf4j
 public class TeacherService implements ITeacherService {
     private final TeacherSubjectRepository teacherSubjectRepository;
+    private final MatchRepository matchRepository;
     private final EntityManager entityManager;
+
+    private final TeacherUserRepository teacherUserRepository;
 
     @Override
     public ResponseEntity<? super GetTeacherListResponseDTO> getTeacherList(String sub1, String sub2, String sub3, String sub4, String sub5) {
         List<TeacherSubjectEntity> teacherSubjectEntities = new ArrayList<>();
-        List<String> conditions = new ArrayList<>();
 
         try {
-            teacherSubjectEntities = teacherSubjectRepository.findAll();
-            String baseQuery = "SELECT t FROM TeacherSubjectEntity t WHERE ";
-            if (sub1 != null && !sub1.isEmpty()) conditions.add("t." + sub1 + " = 1");
-            if (sub2 != null && !sub2.isEmpty()) conditions.add("t." + sub2 + " = 1");
-            if (sub3 != null && !sub3.isEmpty()) conditions.add("t." + sub3 + " = 1");
-            if (sub4 != null && !sub4.isEmpty()) conditions.add("t." + sub4 + " = 1");
-            if (sub5 != null && !sub5.isEmpty()) conditions.add("t." + sub5 + " = 1");
+            CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+            CriteriaQuery<TeacherSubjectEntity> query = builder.createQuery(TeacherSubjectEntity.class);
+            Root<TeacherSubjectEntity> root = query.from(TeacherSubjectEntity.class);
+            List<Predicate> predicates = new ArrayList<>();
 
-            if (!conditions.isEmpty()) {
-                String finalQuery = baseQuery + String.join(" OR ", conditions);
-                TypedQuery<TeacherSubjectEntity> query = entityManager.createQuery(finalQuery, TeacherSubjectEntity.class);
-                teacherSubjectEntities = query.getResultList();
-            }else{
-                teacherSubjectEntities = teacherSubjectRepository.findAll();
+            if (sub1 != null && !sub1.isEmpty()) {
+                predicates.add(builder.equal(root.get(sub1), true));
+            }
+            if (sub2 != null && !sub2.isEmpty()) {
+                predicates.add(builder.equal(root.get(sub2), true));
+            }
+            if (sub3 != null && !sub3.isEmpty()) {
+                predicates.add(builder.equal(root.get(sub3), true));
+            }
+            if (sub4 != null && !sub4.isEmpty()) {
+                predicates.add(builder.equal(root.get(sub4), true));
+            }
+            if (sub5 != null && !sub5.isEmpty()) {
+                predicates.add(builder.equal(root.get(sub5), true));
             }
 
+            if (!predicates.isEmpty()) {
+                query.where(builder.or(predicates.toArray(new Predicate[0])));
+            }
+
+            TypedQuery<TeacherSubjectEntity> typedQuery = entityManager.createQuery(query);
+            teacherSubjectEntities = typedQuery.getResultList();
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
@@ -51,5 +74,28 @@ public class TeacherService implements ITeacherService {
 
         return GetTeacherListResponseDTO.success(teacherSubjectEntities);
 
+    }
+
+    @Override
+    public ResponseEntity<? super PostApplyTeacherResponseDTO> postApplyTeacher(PostApplyTeacherRequestDTO requestBody, String userId) {
+        String teacherId = requestBody.teacherId();
+        String studentId = userId;
+
+        try {
+            TeacherUserEntity teacherUserEntity = teacherUserRepository.findByUserId(teacherId);
+            if (teacherUserEntity == null) {
+                return PostApplyTeacherResponseDTO.notExistUser();
+            }
+            MatchEntity entity = MatchEntity.builder()
+                    .teacherId(teacherId)
+                    .studentId(studentId)
+                    .status("A")
+                    .build();
+            matchRepository.save(entity);
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResponseDTO.databaseError();
+        }
+        return PostApplyTeacherResponseDTO.success();
     }
 }

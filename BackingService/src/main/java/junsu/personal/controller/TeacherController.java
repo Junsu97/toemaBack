@@ -1,14 +1,15 @@
 package junsu.personal.controller;
 
+import jakarta.validation.Valid;
+import junsu.personal.dto.request.teacher.PostApplyTeacherRequestDTO;
 import junsu.personal.dto.response.teacher.GetTeacherListResponseDTO;
+import junsu.personal.dto.response.teacher.PostApplyTeacherResponseDTO;
 import junsu.personal.service.ITeacherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value="/api/v1/teacher")
@@ -28,6 +29,15 @@ public class TeacherController {
         log.info("getTeacherList Start!!!!");
         ResponseEntity<? super GetTeacherListResponseDTO> response = teacherService.getTeacherList(sub1, sub2, sub3, sub4, sub5);
         log.info("getTeacherList End!!!!!!!!");
+        return response;
+    }
+
+    @PostMapping(value = "/apply")
+    public ResponseEntity<? super PostApplyTeacherResponseDTO> postApplyTeacher(@RequestBody @Valid PostApplyTeacherRequestDTO requestBody,
+                                                                                @AuthenticationPrincipal String userId){
+        log.info("postApplyTeacher Start!!!");
+        ResponseEntity<? super PostApplyTeacherResponseDTO> response = teacherService.postApplyTeacher(requestBody,userId);
+        log.info("postApplyTeacher End!!!");
         return response;
     }
 }
