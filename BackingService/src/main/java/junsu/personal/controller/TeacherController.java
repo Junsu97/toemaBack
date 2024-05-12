@@ -3,6 +3,7 @@ package junsu.personal.controller;
 import junsu.personal.dto.response.teacher.GetTeacherListResponseDTO;
 import junsu.personal.service.ITeacherService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/teacher")
+@RequestMapping(value="/api/v1/teacher")
 @RequiredArgsConstructor
+@Slf4j
 public class TeacherController {
     private final ITeacherService teacherService;
 
@@ -23,7 +25,9 @@ public class TeacherController {
                                                                             @PathVariable(value = "sub3", required = false) String sub3,
                                                                             @PathVariable(value = "sub4", required = false) String sub4,
                                                                             @PathVariable(value = "sub5", required = false) String sub5) {
+        log.info("getTeacherList Start!!!!");
         ResponseEntity<? super GetTeacherListResponseDTO> response = teacherService.getTeacherList(sub1, sub2, sub3, sub4, sub5);
+        log.info("getTeacherList End!!!!!!!!");
         return response;
     }
 }

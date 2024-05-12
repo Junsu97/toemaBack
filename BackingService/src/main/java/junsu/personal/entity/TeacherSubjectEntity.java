@@ -41,4 +41,9 @@ public class TeacherSubjectEntity {
 
     @Column(name = "DESCRIPTION")
     private String desc;
+
+    @Column(name = "PROFILE_IMAGE")
+    private String profileImage;
+    @Column(name = "SCHOOL")
+    private String school;
 }

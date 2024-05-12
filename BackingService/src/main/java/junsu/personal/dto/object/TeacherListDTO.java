@@ -14,21 +14,25 @@ public record TeacherListDTO(
         Boolean science,
         Boolean social,
         Boolean english,
-        String desc
+        String desc,
+        String profileImage,
+        String school
 ) {
-    public TeacherListDTO(TeacherSubjectEntity teacherSubjectEntity){
+    public TeacherListDTO(TeacherSubjectEntity teacherSubjectEntity) {
         this(teacherSubjectEntity.getUserId(),
                 teacherSubjectEntity.getKorean(),
                 teacherSubjectEntity.getMath(),
                 teacherSubjectEntity.getScience(),
                 teacherSubjectEntity.getSocial(),
                 teacherSubjectEntity.getEnglish(),
-                teacherSubjectEntity.getDesc());
+                teacherSubjectEntity.getDesc(),
+                teacherSubjectEntity.getProfileImage(),
+                teacherSubjectEntity.getProfileImage());
     }
 
-    public static List<TeacherListDTO> getList(List<TeacherSubjectEntity> teacherSubjectEntities){
+    public static List<TeacherListDTO> getList(List<TeacherSubjectEntity> teacherSubjectEntities) {
         List<TeacherListDTO> list = new ArrayList<>();
-        for(TeacherSubjectEntity entity : teacherSubjectEntities){
+        for (TeacherSubjectEntity entity : teacherSubjectEntities) {
             TeacherListDTO teacherListDTO = new TeacherListDTO(entity);
             list.add(teacherListDTO);
         }
