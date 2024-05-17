@@ -107,6 +107,7 @@ public class BoardService implements IBoardService {
 
     @Override
     public ResponseEntity<? super GetTop3BoardListResponseDTO> getTop3BoardList() {
+        log.info("getTop3 Start!!!");
         List<BoardListViewEntity> boardListViewEntities = new ArrayList<>();
         try{
             Date beforeWeek = Date.from(Instant.now().minus(7, ChronoUnit.DAYS));
@@ -191,8 +192,8 @@ public class BoardService implements IBoardService {
             if (boardEntity == null) return PostCommentResponseDTO.noExistBoard();
             boolean existedUser = userRepository.existsByUserId(userId) || teacherUserRepository.existsByUserId(userId);
             if (!existedUser) return PostCommentResponseDTO.noExistUser();
-
-            CommentEntity commentEntity = new CommentEntity(pDTO, boardNumber, userId);
+            long seq = commentRepository.countByBoardNumber(boardNumber) + 1;
+            CommentEntity commentEntity = new CommentEntity(seq,pDTO, boardNumber, userId);
             commentRepository.save(commentEntity);
 
             boardEntity.increaseCommentCount();

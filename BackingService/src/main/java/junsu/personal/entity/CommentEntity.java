@@ -2,6 +2,8 @@ package junsu.personal.entity;
 
 import jakarta.persistence.*;
 import junsu.personal.dto.request.board.PostCommentRequestDTO;
+import junsu.personal.entity.primaryKey.CommentPK;
+import junsu.personal.entity.primaryKey.FavoritePk;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -18,11 +20,11 @@ import java.time.Instant;
 @DynamicInsert
 @DynamicUpdate
 @Builder
+@IdClass(CommentPK.class)
 public class CommentEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "COMMENT_NUMBER")
-    private Long comment_Number;
+    private Long commentNumber;
 
     @NonNull
     @Column(name = "CONTENT", nullable = false)
@@ -36,14 +38,16 @@ public class CommentEntity {
     @Column(name="USER_ID", nullable = false)
     private String userId;
 
+    @Id
     @NonNull
     @Column(name="BOARD_NUMBER", nullable = false)
     private Long boardNumber;
 
-    public CommentEntity(PostCommentRequestDTO pDTO, Long boardNumber, String userId){
+    public CommentEntity(long seq,PostCommentRequestDTO pDTO, Long boardNumber, String userId){
         java.util.Date now = Date.from(Instant.now());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String writeDatetime = simpleDateFormat.format(now);
+        this.commentNumber = seq;
         this.content = pDTO.content();
         this.writeDatetime = writeDatetime;
         this.userId = userId;
