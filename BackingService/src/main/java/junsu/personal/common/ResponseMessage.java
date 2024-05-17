@@ -7,6 +7,7 @@ public interface ResponseMessage {
     /** HTTP Status 400*/
     String VALIDATION_FAILED = "Validation failed.";
     String DUPLICATE_ID = "Duplication ID.";
+    String DUPLICATE_APPLY = "Duplication Apply";
     String DUPLICATE_NICKNAME = "Duplication Nickname.";
     String DUPLICATE_EMAIL = "Duplication Email.";
     String DUPLICATE_TEL_NUMBER = "Duplication Tel Number.";

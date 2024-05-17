@@ -7,4 +7,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MatchRepository extends JpaRepository<MatchEntity, MatchAndHomeworkPk> {
+    MatchEntity findByStudentId(String userId);
+    MatchEntity findByTeacherId(String userId);
+    MatchEntity findByTeacherIdAndStudentId(String teacherId, String studentId);
+    MatchEntity findByStudentIdAndStatus(String userId, String status);
 }

@@ -2,6 +2,8 @@ package junsu.personal.controller;
 
 import jakarta.validation.Valid;
 import junsu.personal.dto.request.teacher.PostApplyTeacherRequestDTO;
+import junsu.personal.dto.response.teacher.GetApplyBeforeResponseDTO;
+import junsu.personal.dto.response.teacher.GetTeacherInfoResponseDTO;
 import junsu.personal.dto.response.teacher.GetTeacherListResponseDTO;
 import junsu.personal.dto.response.teacher.PostApplyTeacherResponseDTO;
 import junsu.personal.service.ITeacherService;
@@ -17,6 +19,12 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class TeacherController {
     private final ITeacherService teacherService;
+
+    @GetMapping("/{teacherUserId}")
+    public ResponseEntity<? super GetTeacherInfoResponseDTO> getTeacher(@PathVariable("teacherUserId") String userId){
+        ResponseEntity<? super GetTeacherInfoResponseDTO> response = teacherService.getTeacher(userId);
+        return response;
+    }
 
     @GetMapping(value = {"/list", "/list/{sub1}", "/list/{sub1}/{sub2}",
             "/list/{sub1}/{sub2}/{sub3}", "/list/{sub1}/{sub2}/{sub3}/{sub4}",
@@ -38,6 +46,14 @@ public class TeacherController {
         log.info("postApplyTeacher Start!!!");
         ResponseEntity<? super PostApplyTeacherResponseDTO> response = teacherService.postApplyTeacher(requestBody,userId);
         log.info("postApplyTeacher End!!!");
+        return response;
+    }
+
+    @GetMapping(value = "/apply")
+    public ResponseEntity<? super GetApplyBeforeResponseDTO> getApplyBefore(@AuthenticationPrincipal String userId){
+        log.info("getApplyBefore Start!!!!");
+        ResponseEntity<? super GetApplyBeforeResponseDTO> response = teacherService.getApplyBefore(userId);
+        log.info("getApplyBefore End!!!!");
         return response;
     }
 }

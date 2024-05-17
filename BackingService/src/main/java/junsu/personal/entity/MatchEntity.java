@@ -22,8 +22,10 @@ public class MatchEntity {
     @Id
     @Column(name = "TEACHER_ID")
     String teacherId;
-
-    @NonNull
     @Column(name = "STATUS")
     String status;
+    @Column(name = "CONTENT")
+    String content;
+    @Column(name = "WRITE_DATETIME")
+    private String writeDatetime;
 }

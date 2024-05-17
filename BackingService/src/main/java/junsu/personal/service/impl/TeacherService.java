@@ -8,6 +8,8 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import junsu.personal.dto.request.teacher.PostApplyTeacherRequestDTO;
 import junsu.personal.dto.response.ResponseDTO;
+import junsu.personal.dto.response.teacher.GetApplyBeforeResponseDTO;
+import junsu.personal.dto.response.teacher.GetTeacherInfoResponseDTO;
 import junsu.personal.dto.response.teacher.GetTeacherListResponseDTO;
 import junsu.personal.dto.response.teacher.PostApplyTeacherResponseDTO;
 import junsu.personal.entity.MatchEntity;
@@ -16,6 +18,7 @@ import junsu.personal.entity.TeacherUserEntity;
 import junsu.personal.repository.MatchRepository;
 import junsu.personal.repository.TeacherSubjectRepository;
 import junsu.personal.repository.TeacherUserRepository;
+import junsu.personal.repository.resultSet.GetTeacherInfoResultSet;
 import junsu.personal.service.ITeacherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +37,20 @@ public class TeacherService implements ITeacherService {
     private final EntityManager entityManager;
 
     private final TeacherUserRepository teacherUserRepository;
+
+    @Override
+    public ResponseEntity<? super GetTeacherInfoResponseDTO> getTeacher(String userId) {
+        GetTeacherInfoResultSet resultSet = null;
+        try{
+            resultSet = teacherUserRepository.getTeacher(userId);
+            if(resultSet == null) return GetTeacherInfoResponseDTO.noExistsUser();
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+
+        return GetTeacherInfoResponseDTO.success(resultSet);
+    }
 
     @Override
     public ResponseEntity<? super GetTeacherListResponseDTO> getTeacherList(String sub1, String sub2, String sub3, String sub4, String sub5) {
@@ -77,8 +94,23 @@ public class TeacherService implements ITeacherService {
     }
 
     @Override
+    public ResponseEntity<? super GetApplyBeforeResponseDTO> getApplyBefore(String userId) {
+        try {
+            MatchEntity matchEntity = matchRepository.findByStudentId(userId);
+            if(matchEntity != null) {
+                return GetApplyBeforeResponseDTO.duplicateApply();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            ResponseDTO.databaseError();
+        }
+        return GetApplyBeforeResponseDTO.success();
+    }
+
+    @Override
     public ResponseEntity<? super PostApplyTeacherResponseDTO> postApplyTeacher(PostApplyTeacherRequestDTO requestBody, String userId) {
         String teacherId = requestBody.teacherId();
+        String content = requestBody.content();
         String studentId = userId;
 
         try {
@@ -90,6 +122,7 @@ public class TeacherService implements ITeacherService {
                     .teacherId(teacherId)
                     .studentId(studentId)
                     .status("A")
+                    .content(content)
                     .build();
             matchRepository.save(entity);
         } catch (Exception e) {
