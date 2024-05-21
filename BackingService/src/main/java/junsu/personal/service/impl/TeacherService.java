@@ -6,12 +6,10 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import junsu.personal.dto.request.teacher.GetApplyListRequestDTO;
 import junsu.personal.dto.request.teacher.PostApplyTeacherRequestDTO;
 import junsu.personal.dto.response.ResponseDTO;
-import junsu.personal.dto.response.teacher.GetApplyBeforeResponseDTO;
-import junsu.personal.dto.response.teacher.GetTeacherInfoResponseDTO;
-import junsu.personal.dto.response.teacher.GetTeacherListResponseDTO;
-import junsu.personal.dto.response.teacher.PostApplyTeacherResponseDTO;
+import junsu.personal.dto.response.teacher.*;
 import junsu.personal.entity.MatchEntity;
 import junsu.personal.entity.TeacherSubjectEntity;
 import junsu.personal.entity.TeacherUserEntity;
@@ -94,11 +92,25 @@ public class TeacherService implements ITeacherService {
     }
 
     @Override
+    public ResponseEntity<? super GetApplyListResponseDTO> getApplyList(GetApplyListRequestDTO requestBody) {
+        List<MatchEntity> matchEntities = new ArrayList<>();
+        String userType = requestBody.userType();
+        try{
+            matchEntities = matchRepository.findByOrderByWriteDatetimeDesc();
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return GetApplyListResponseDTO.success(matchEntities, userType);
+    }
+
+    @Override
     public ResponseEntity<? super GetApplyBeforeResponseDTO> getApplyBefore(String userId) {
         try {
             MatchEntity matchEntity = matchRepository.findByStudentId(userId);
             if(matchEntity != null) {
-                return GetApplyBeforeResponseDTO.duplicateApply();
+                if(matchEntity.getStatus().equals("A"))
+                    return GetApplyBeforeResponseDTO.duplicateApply();
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -118,16 +130,23 @@ public class TeacherService implements ITeacherService {
             if (teacherUserEntity == null) {
                 return PostApplyTeacherResponseDTO.notExistUser();
             }
-            MatchEntity entity = MatchEntity.builder()
-                    .teacherId(teacherId)
-                    .studentId(studentId)
-                    .status("A")
-                    .content(content)
-                    .build();
-            matchRepository.save(entity);
+            MatchEntity temp = matchRepository.findByTeacherIdAndStudentId(teacherId,studentId);
+            if(!temp.getStatus().equals("A")){
+                temp = temp.toBuilder().status("A").build();
+                matchRepository.save(temp);
+            }else{
+                temp = null;
+                MatchEntity entity = MatchEntity.builder()
+                        .teacherId(teacherId)
+                        .studentId(studentId)
+                        .status("A")
+                        .content(content)
+                        .build();
+                matchRepository.save(entity);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            ResponseDTO.databaseError();
+            return ResponseDTO.databaseError();
         }
         return PostApplyTeacherResponseDTO.success();
     }

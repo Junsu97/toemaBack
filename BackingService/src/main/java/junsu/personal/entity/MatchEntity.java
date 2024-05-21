@@ -9,11 +9,11 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "MATCH")
-@Table(name="MATCH")
+@Entity(name = "CONNECTION")
+@Table(name="CONNECTION")
 @DynamicInsert
 @DynamicUpdate
-@Builder
+@Builder(toBuilder = true)
 @IdClass(MatchAndHomeworkPk.class)
 public class MatchEntity {
     @Id

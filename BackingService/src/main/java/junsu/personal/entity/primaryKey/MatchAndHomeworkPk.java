@@ -13,9 +13,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MatchAndHomeworkPk implements Serializable {
-    @Column(name = "USER_ID")
+    @Column(name = "STUDENT_ID")
     private String studentId;
 
-    @Column(name = "USER_ID")
+    @Column(name = "TEACHER_ID")
     private String teacherId;
 }

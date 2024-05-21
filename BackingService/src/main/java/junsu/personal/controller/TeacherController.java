@@ -1,16 +1,15 @@
 package junsu.personal.controller;
 
 import jakarta.validation.Valid;
+import junsu.personal.dto.request.teacher.GetApplyListRequestDTO;
 import junsu.personal.dto.request.teacher.PostApplyTeacherRequestDTO;
-import junsu.personal.dto.response.teacher.GetApplyBeforeResponseDTO;
-import junsu.personal.dto.response.teacher.GetTeacherInfoResponseDTO;
-import junsu.personal.dto.response.teacher.GetTeacherListResponseDTO;
-import junsu.personal.dto.response.teacher.PostApplyTeacherResponseDTO;
+import junsu.personal.dto.response.teacher.*;
 import junsu.personal.service.ITeacherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -54,6 +53,12 @@ public class TeacherController {
         log.info("getApplyBefore Start!!!!");
         ResponseEntity<? super GetApplyBeforeResponseDTO> response = teacherService.getApplyBefore(userId);
         log.info("getApplyBefore End!!!!");
+        return response;
+    }
+
+    @PostMapping(value = "/apply-list")
+    public ResponseEntity<? super GetApplyListResponseDTO> getApplyList(@RequestBody @Valid GetApplyListRequestDTO requestBody){
+        ResponseEntity<? super GetApplyListResponseDTO> response = teacherService.getApplyList(requestBody);
         return response;
     }
 }

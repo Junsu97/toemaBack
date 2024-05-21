@@ -5,8 +5,11 @@ import junsu.personal.entity.primaryKey.MatchAndHomeworkPk;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MatchRepository extends JpaRepository<MatchEntity, MatchAndHomeworkPk> {
+    List<MatchEntity> findByOrderByWriteDatetimeDesc();
     MatchEntity findByStudentId(String userId);
     MatchEntity findByTeacherId(String userId);
     MatchEntity findByTeacherIdAndStudentId(String teacherId, String studentId);
