@@ -25,6 +25,12 @@ public class TeacherController {
         return response;
     }
 
+    @GetMapping("/{teacherId}/{studentId}")
+    public ResponseEntity<? super GetApplyInfoResponseDTO> getApplyInfo(@PathVariable("teacherId") String teacherId, @PathVariable("studentId") String studentId){
+        ResponseEntity<? super GetApplyInfoResponseDTO> response = teacherService.getApplyInfo(teacherId, studentId);
+        return response;
+    }
+
     @GetMapping(value = {"/list", "/list/{sub1}", "/list/{sub1}/{sub2}",
             "/list/{sub1}/{sub2}/{sub3}", "/list/{sub1}/{sub2}/{sub3}/{sub4}",
             "/list/{sub1}/{sub2}/{sub3}/{sub4}/{sub5}"})

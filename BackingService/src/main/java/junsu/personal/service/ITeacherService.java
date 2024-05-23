@@ -9,6 +9,7 @@ public interface ITeacherService {
     ResponseEntity<? super GetTeacherInfoResponseDTO> getTeacher(String userId);
     ResponseEntity<? super GetTeacherListResponseDTO> getTeacherList(String sub1, String sub2, String sub3, String sub4, String sub5);
     ResponseEntity<? super GetApplyListResponseDTO> getApplyList(GetApplyListRequestDTO requestBody);
+    ResponseEntity<? super GetApplyInfoResponseDTO> getApplyInfo(String teacherId, String studentId);
     ResponseEntity<? super GetApplyBeforeResponseDTO> getApplyBefore(String userId);
     ResponseEntity<? super PostApplyTeacherResponseDTO> postApplyTeacher(PostApplyTeacherRequestDTO requestBody, String userId);
 

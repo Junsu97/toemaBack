@@ -105,6 +105,21 @@ public class TeacherService implements ITeacherService {
     }
 
     @Override
+    public ResponseEntity<? super GetApplyInfoResponseDTO> getApplyInfo(String teacherId, String studentId) {
+        MatchEntity matchEntity = null;
+        try{
+            matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
+            if(matchEntity == null){
+                return GetApplyInfoResponseDTO.notExistApply();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return GetApplyInfoResponseDTO.success(matchEntity);
+    }
+
+    @Override
     public ResponseEntity<? super GetApplyBeforeResponseDTO> getApplyBefore(String userId) {
         try {
             MatchEntity matchEntity = matchRepository.findByStudentId(userId);
