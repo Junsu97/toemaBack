@@ -2,6 +2,7 @@ package junsu.personal.controller;
 
 import jakarta.validation.Valid;
 import junsu.personal.dto.request.teacher.GetApplyListRequestDTO;
+import junsu.personal.dto.request.teacher.PatchApplyRequestDTO;
 import junsu.personal.dto.request.teacher.PostApplyTeacherRequestDTO;
 import junsu.personal.dto.response.teacher.*;
 import junsu.personal.service.ITeacherService;
@@ -51,6 +52,13 @@ public class TeacherController {
         log.info("postApplyTeacher Start!!!");
         ResponseEntity<? super PostApplyTeacherResponseDTO> response = teacherService.postApplyTeacher(requestBody,userId);
         log.info("postApplyTeacher End!!!");
+        return response;
+    }
+
+    @PatchMapping(value = "/apply")
+    public ResponseEntity<? super PatchApplyResponseDTO> patchApply(@RequestBody @Valid PatchApplyRequestDTO requestBody,
+                                                                    @AuthenticationPrincipal String userId){
+        ResponseEntity<? super PatchApplyResponseDTO> response = teacherService.patchApply(requestBody, userId);
         return response;
     }
 

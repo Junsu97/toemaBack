@@ -19,14 +19,14 @@ public record ApplyListDTO(
     public static ApplyListDTO fromMatchEntity(MatchEntity matchEntity, String userType) {
         if (userType.equals(UserType.STUDENT.getValue())) {
             return new ApplyListDTO(
-                    matchEntity.getStudentId(),
+                    matchEntity.getTeacherId(),
                     matchEntity.getStatus(),
                     matchEntity.getContent(),
                     matchEntity.getWriteDatetime()
             );
         } else {
             return new ApplyListDTO(
-                    matchEntity.getTeacherId(),
+                    matchEntity.getStudentId(),
                     matchEntity.getStatus(),
                     matchEntity.getContent(),
                     matchEntity.getWriteDatetime()

@@ -6,7 +6,9 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import junsu.personal.auth.UserType;
 import junsu.personal.dto.request.teacher.GetApplyListRequestDTO;
+import junsu.personal.dto.request.teacher.PatchApplyRequestDTO;
 import junsu.personal.dto.request.teacher.PostApplyTeacherRequestDTO;
 import junsu.personal.dto.response.ResponseDTO;
 import junsu.personal.dto.response.teacher.*;
@@ -39,10 +41,10 @@ public class TeacherService implements ITeacherService {
     @Override
     public ResponseEntity<? super GetTeacherInfoResponseDTO> getTeacher(String userId) {
         GetTeacherInfoResultSet resultSet = null;
-        try{
+        try {
             resultSet = teacherUserRepository.getTeacher(userId);
-            if(resultSet == null) return GetTeacherInfoResponseDTO.noExistsUser();
-        }catch (Exception e){
+            if (resultSet == null) return GetTeacherInfoResponseDTO.noExistsUser();
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }
@@ -95,9 +97,15 @@ public class TeacherService implements ITeacherService {
     public ResponseEntity<? super GetApplyListResponseDTO> getApplyList(GetApplyListRequestDTO requestBody) {
         List<MatchEntity> matchEntities = new ArrayList<>();
         String userType = requestBody.userType();
-        try{
-            matchEntities = matchRepository.findByOrderByWriteDatetimeDesc();
-        }catch (Exception e){
+        String userId = requestBody.userId();
+        try {
+            if(userType.equals(UserType.STUDENT.getValue())){
+                matchEntities = matchRepository.findByStudentIdOrderByWriteDatetimeDesc(userId);
+            }else{
+                matchEntities = matchRepository.findByTeacherIdOrderByWriteDatetimeDesc(userId);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }
@@ -107,12 +115,13 @@ public class TeacherService implements ITeacherService {
     @Override
     public ResponseEntity<? super GetApplyInfoResponseDTO> getApplyInfo(String teacherId, String studentId) {
         MatchEntity matchEntity = null;
-        try{
+        try {
             matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
-            if(matchEntity == null){
+            log.info("teacherId : " + teacherId + " studentId : " + studentId);
+            if (matchEntity == null) {
                 return GetApplyInfoResponseDTO.notExistApply();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }
@@ -120,14 +129,44 @@ public class TeacherService implements ITeacherService {
     }
 
     @Override
+    public ResponseEntity<? super PatchApplyResponseDTO> patchApply(PatchApplyRequestDTO requestBody, String userId) {
+        log.info("patchApply 의 studentId" + requestBody.studentId());
+        try {
+            String studentId = requestBody.studentId();
+            String teacherId = requestBody.teacherId();
+            String userType = requestBody.userType();
+            MatchEntity entity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
+            if(userType.equals(UserType.STUDENT.getValue())){
+                if(!studentId.equals(userId)){
+                    return PatchApplyResponseDTO.noPermission();
+                }
+            }else{
+                if(!teacherId.equals(userId)){
+                    return PatchApplyResponseDTO.noPermission();
+                }
+            }
+
+            if (entity == null) {
+                return PatchApplyResponseDTO.notExistApply();
+            }
+            entity = entity.toBuilder().content(requestBody.content()).status(requestBody.status()).build();
+            matchRepository.save(entity);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return PatchApplyResponseDTO.success();
+    }
+
+    @Override
     public ResponseEntity<? super GetApplyBeforeResponseDTO> getApplyBefore(String userId) {
         try {
             MatchEntity matchEntity = matchRepository.findByStudentId(userId);
-            if(matchEntity != null) {
-                if(matchEntity.getStatus().equals("A"))
+            if (matchEntity != null) {
+                if (matchEntity.getStatus().equals("신청됨")|| matchEntity.getStatus().equals("승인됨"))
                     return GetApplyBeforeResponseDTO.duplicateApply();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             ResponseDTO.databaseError();
         }
@@ -145,24 +184,28 @@ public class TeacherService implements ITeacherService {
             if (teacherUserEntity == null) {
                 return PostApplyTeacherResponseDTO.notExistUser();
             }
-            MatchEntity temp = matchRepository.findByTeacherIdAndStudentId(teacherId,studentId);
-            if(!temp.getStatus().equals("A")){
-                temp = temp.toBuilder().status("A").build();
-                matchRepository.save(temp);
-            }else{
-                temp = null;
-                MatchEntity entity = MatchEntity.builder()
-                        .teacherId(teacherId)
-                        .studentId(studentId)
-                        .status("A")
-                        .content(content)
-                        .build();
-                matchRepository.save(entity);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseDTO.databaseError();
-        }
-        return PostApplyTeacherResponseDTO.success();
+//            MatchEntity temp = matchRepository.findByTeacherIdAndStudentId(teacherId,studentId);
+//
+//            if(temp == null || temp.getStatus().equals("A")){
+            MatchEntity entity = MatchEntity.builder()
+                    .teacherId(teacherId)
+                    .studentId(studentId)
+                    .status("신청됨")
+                    .content(content)
+                    .build();
+            matchRepository.save(entity);
+//            }else if(!temp.getStatus().equals("A")){
+//
+//                temp = temp.toBuilder().status("A").build();
+//                matchRepository.save(temp);
+//        }
+    } catch(
+    Exception e)
+
+    {
+        e.printStackTrace();
+        return ResponseDTO.databaseError();
     }
+        return PostApplyTeacherResponseDTO.success();
+}
 }

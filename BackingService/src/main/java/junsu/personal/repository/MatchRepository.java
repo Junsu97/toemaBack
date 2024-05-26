@@ -9,7 +9,8 @@ import java.util.List;
 
 @Repository
 public interface MatchRepository extends JpaRepository<MatchEntity, MatchAndHomeworkPk> {
-    List<MatchEntity> findByOrderByWriteDatetimeDesc();
+    List<MatchEntity> findByStudentIdOrderByWriteDatetimeDesc(String userId);
+    List<MatchEntity> findByTeacherIdOrderByWriteDatetimeDesc(String userId);
     MatchEntity findByStudentId(String userId);
     MatchEntity findByTeacherId(String userId);
     MatchEntity findByTeacherIdAndStudentId(String teacherId, String studentId);

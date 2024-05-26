@@ -211,7 +211,8 @@ public class AuthService implements IAuthService {
                     if(distance < minDistance){
                         minDistance = distance;
                         log.info("minDistance : " + minDistance);
-                        if(Math.abs(minDistance) < threshold){
+                        log.info("domain user : " + domain.getUserId());
+                        if(minDistance < threshold){
                             userId = domain.getUserId();
                         }
                     }
