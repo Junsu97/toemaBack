@@ -7,6 +7,7 @@ import junsu.personal.dto.response.teacher.*;
 import org.springframework.http.ResponseEntity;
 
 public interface ITeacherService {
+    ResponseEntity<? super GetStudentListResponseDTO> getStudentList(String userId);
     ResponseEntity<? super GetTeacherInfoResponseDTO> getTeacher(String userId);
     ResponseEntity<? super GetTeacherListResponseDTO> getTeacherList(String sub1, String sub2, String sub3, String sub4, String sub5);
     ResponseEntity<? super GetApplyListResponseDTO> getApplyList(GetApplyListRequestDTO requestBody);

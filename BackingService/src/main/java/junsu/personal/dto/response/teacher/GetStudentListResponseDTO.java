@@ -23,4 +23,9 @@ public class GetStudentListResponseDTO extends ResponseDTO {
         GetStudentListResponseDTO result = new GetStudentListResponseDTO(userEntities);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
+
+    public static ResponseEntity<ResponseDTO> notExistUser() {
+        ResponseDTO result = new ResponseDTO(ResponseCode.NOT_EXISTED_USER, ResponseMessage.NOT_EXISTED_USER);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
+    }
 }

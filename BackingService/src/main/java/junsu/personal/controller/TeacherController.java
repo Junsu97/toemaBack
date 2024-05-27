@@ -1,5 +1,6 @@
 package junsu.personal.controller;
 
+import com.amazonaws.Response;
 import jakarta.validation.Valid;
 import junsu.personal.dto.request.teacher.GetApplyListRequestDTO;
 import junsu.personal.dto.request.teacher.PatchApplyRequestDTO;
@@ -19,6 +20,12 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class TeacherController {
     private final ITeacherService teacherService;
+
+    @GetMapping("/getStudentList")
+    public ResponseEntity<? super GetStudentListResponseDTO> getStudentList(@AuthenticationPrincipal String userId){
+        ResponseEntity<? super GetStudentListResponseDTO> response = teacherService.getStudentList(userId);
+        return response;
+    }
 
     @GetMapping("/{teacherUserId}")
     public ResponseEntity<? super GetTeacherInfoResponseDTO> getTeacher(@PathVariable("teacherUserId") String userId){

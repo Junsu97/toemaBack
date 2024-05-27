@@ -1,21 +1,22 @@
 package junsu.personal.service.impl;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
 import junsu.personal.auth.UserType;
 import junsu.personal.dto.request.teacher.GetApplyListRequestDTO;
 import junsu.personal.dto.request.teacher.PatchApplyRequestDTO;
 import junsu.personal.dto.request.teacher.PostApplyTeacherRequestDTO;
 import junsu.personal.dto.response.ResponseDTO;
 import junsu.personal.dto.response.teacher.*;
-import junsu.personal.entity.MatchEntity;
-import junsu.personal.entity.TeacherSubjectEntity;
-import junsu.personal.entity.TeacherUserEntity;
+import junsu.personal.entity.*;
 import junsu.personal.repository.MatchRepository;
+import junsu.personal.repository.StudentUserRepository;
 import junsu.personal.repository.TeacherSubjectRepository;
 import junsu.personal.repository.TeacherUserRepository;
 import junsu.personal.repository.resultSet.GetTeacherInfoResultSet;
@@ -35,8 +36,34 @@ public class TeacherService implements ITeacherService {
     private final TeacherSubjectRepository teacherSubjectRepository;
     private final MatchRepository matchRepository;
     private final EntityManager entityManager;
-
+    private final StudentUserRepository studentUserRepository;
     private final TeacherUserRepository teacherUserRepository;
+    private final JPAQueryFactory queryFactory;
+
+
+    @Override
+    public ResponseEntity<? super GetStudentListResponseDTO> getStudentList(String userId) {
+        List<StudentUserEntity> studentUserEntities = new ArrayList<>();
+        QStudentUserEntity qStudentUserEntity = QStudentUserEntity.studentUserEntity;
+        QMatchEntity qMatchEntity = QMatchEntity.matchEntity;
+        try{
+            studentUserEntities = queryFactory
+                    .selectFrom(qStudentUserEntity)
+                    .innerJoin(qMatchEntity)
+                    .on(qStudentUserEntity.userId.eq(qMatchEntity.studentId))
+                    .where(qMatchEntity.teacherId.eq(userId).
+                            and(qMatchEntity.status.eq("승인됨")))
+                    .fetch();
+
+            if(studentUserEntities == null || studentUserEntities.isEmpty()){
+                return GetStudentListResponseDTO.notExistUser();
+            }
+
+        }catch (Exception e){
+            return ResponseDTO.databaseError();
+        }
+        return GetStudentListResponseDTO.success(studentUserEntities);
+    }
 
     @Override
     public ResponseEntity<? super GetTeacherInfoResponseDTO> getTeacher(String userId) {
