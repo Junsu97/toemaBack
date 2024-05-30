@@ -336,7 +336,6 @@ public class BoardService implements IBoardService {
             if(entity == null){
                 return DeleteCommentResponseDTO.noExistComment();
             }
-
             commentRepository.delete(entity);
         }catch (Exception e){
             e.printStackTrace();

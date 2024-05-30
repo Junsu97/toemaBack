@@ -157,6 +157,11 @@ public class AuthService implements IAuthService {
             String userType = "";
             if (pDTO.userType().equalsIgnoreCase(UserType.STUDENT.getValue())) {
                 userType = UserType.STUDENT.getValue();
+
+                boolean isEmpty = studentUserRepository.existsByUserId(pDTO.userId());
+                if(!isEmpty){
+                    return SignInResponseDTO.signInFailed();
+                }
                 StudentUserEntity userEntity = studentUserRepository.findByUserId(userId);
 
                 if (userEntity == null) return SignInResponseDTO.signInFailed();
@@ -169,6 +174,10 @@ public class AuthService implements IAuthService {
 
             } else if (pDTO.userType().equalsIgnoreCase(UserType.TEACHER.getValue())) {
                 userType = UserType.TEACHER.getValue();
+                boolean isEmpty = teacherUserRepository.existsByUserId(userId);
+                log.info("isEmpty : " + isEmpty);
+                if(!isEmpty) return SignInResponseDTO.signInFailed();
+
                 TeacherUserEntity userEntity = teacherUserRepository.findByUserId(userId);
 
                 if (userId == null) return SignInResponseDTO.signInFailed();
