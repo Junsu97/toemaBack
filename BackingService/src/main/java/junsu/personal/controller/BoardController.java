@@ -3,11 +3,13 @@ package junsu.personal.controller;
 import com.amazonaws.Response;
 import jakarta.validation.Valid;
 import junsu.personal.dto.request.board.PatchBoardRequestDTO;
+import junsu.personal.dto.request.board.PatchCommentRequestDTO;
 import junsu.personal.dto.request.board.PostBoardRequestDTO;
 import junsu.personal.dto.request.board.PostCommentRequestDTO;
 import junsu.personal.dto.response.board.*;
 import junsu.personal.service.IBoardService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/board")
 @RequiredArgsConstructor
+@Slf4j
 public class BoardController {
     private final IBoardService boardService;
 
@@ -109,12 +112,31 @@ public class BoardController {
         return response;
     }
 
+    @PatchMapping("/comment")
+    public ResponseEntity<? super PatchCommentResponseDTO> patchComment(@RequestBody PatchCommentRequestDTO requestBody, @AuthenticationPrincipal String userId){
+        ResponseEntity<? super PatchCommentResponseDTO> response = boardService.patchComment(requestBody, userId);
+        return response;
+    }
+
     @DeleteMapping("/{boardNumber}")
     public ResponseEntity<? super DeleteBoardResponseDTO> deleteBoard(
             @PathVariable("boardNumber") Long boardNumber,
             @AuthenticationPrincipal String userId
     ) {
         ResponseEntity<? super DeleteBoardResponseDTO> result = boardService.deleteBoard(boardNumber, userId);
+        return result;
+    }
+
+    @DeleteMapping("/comment/{boardNumber}/{commentNumber}")
+    public ResponseEntity<? super DeleteCommentResponseDTO> deleteComment(
+            @PathVariable("boardNumber") Long boardNumber,
+            @PathVariable("commentNumber") Long commentNumber,
+            @AuthenticationPrincipal String userId
+    ){
+        log.info("boardNumber : " + boardNumber);
+        log.info("commentNumber : " + commentNumber);
+        log.info("userId : " + userId);
+        ResponseEntity<? super DeleteCommentResponseDTO> result = boardService.deleteComment(boardNumber,commentNumber,userId);
         return result;
     }
 }

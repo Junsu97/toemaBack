@@ -1,6 +1,7 @@
 package junsu.personal.entity;
 
 import jakarta.persistence.*;
+import junsu.personal.dto.request.board.PatchCommentRequestDTO;
 import junsu.personal.dto.request.board.PostCommentRequestDTO;
 import junsu.personal.entity.primaryKey.CommentPK;
 import junsu.personal.entity.primaryKey.FavoritePk;
@@ -52,5 +53,9 @@ public class CommentEntity {
         this.writeDatetime = writeDatetime;
         this.userId = userId;
         this.boardNumber = boardNumber;
+    }
+
+    public void patchComment(PatchCommentRequestDTO requestBody){
+        this.content = requestBody.content();
     }
 }

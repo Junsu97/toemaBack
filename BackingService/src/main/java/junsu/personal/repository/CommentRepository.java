@@ -14,6 +14,8 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<CommentEntity, CommentPK> {
     @Query(value =
             "SELECT " +
+                    "C.BOARD_NUMBER AS boardNumber, " +
+                    "C.COMMENT_NUMBER AS commentNumber, " +
                     " COALESCE(SU.NICKNAME, TU.NICKNAME) AS nickname, " +
                     " COALESCE(SU.PROFILE_IMAGE, TU.PROFILE_IMAGE) AS profileImage, " +
                     " C.WRITE_DATETIME AS writeDatetime, " +
@@ -29,6 +31,8 @@ public interface CommentRepository extends JpaRepository<CommentEntity, CommentP
             nativeQuery = true
     )
     List<GetCommentListResultSet> getCommentList(Long boardNumber);
+
+    CommentEntity findByBoardNumberAndCommentNumber(Long boardNumber, Long CommentNumber);
 
     Long countByBoardNumber(Long boardNumber);
 

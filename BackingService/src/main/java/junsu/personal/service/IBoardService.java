@@ -1,6 +1,7 @@
 package junsu.personal.service;
 
 import junsu.personal.dto.request.board.PatchBoardRequestDTO;
+import junsu.personal.dto.request.board.PatchCommentRequestDTO;
 import junsu.personal.dto.request.board.PostBoardRequestDTO;
 import junsu.personal.dto.request.board.PostCommentRequestDTO;
 import junsu.personal.dto.response.board.*;
@@ -19,6 +20,8 @@ public interface IBoardService {
     ResponseEntity<? super PutFavoriteResponseDTO> putFavorite(Long boardNumber, String userId);
     ResponseEntity<? super PatchBoardResponseDTO> patchBoard(PatchBoardRequestDTO pDTO, Long boardNumber, String userId);
     ResponseEntity<? super IncreaseViewCountResponseDTO> increaseViewCount(Long boardNumber);
+    ResponseEntity<? super PatchCommentResponseDTO> patchComment(PatchCommentRequestDTO requestBody, String userId);
     ResponseEntity<? super DeleteBoardResponseDTO> deleteBoard(Long boardNumber, String userId);
+    ResponseEntity<? super DeleteCommentResponseDTO> deleteComment(Long boardNumber, Long commentNumber, String userId);
 
 }

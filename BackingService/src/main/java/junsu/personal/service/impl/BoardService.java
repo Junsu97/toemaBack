@@ -1,6 +1,7 @@
 package junsu.personal.service.impl;
 
 import junsu.personal.dto.request.board.PatchBoardRequestDTO;
+import junsu.personal.dto.request.board.PatchCommentRequestDTO;
 import junsu.personal.dto.request.board.PostBoardRequestDTO;
 import junsu.personal.dto.request.board.PostCommentRequestDTO;
 import junsu.personal.dto.response.ResponseDTO;
@@ -282,6 +283,27 @@ public class BoardService implements IBoardService {
     }
 
     @Override
+    public ResponseEntity<? super PatchCommentResponseDTO> patchComment(PatchCommentRequestDTO requestBody, String userId) {
+        try{
+            log.info("commentNumbr : " + requestBody.commentNumber());
+            log.info("boardNumber: " + requestBody.boardNumber());
+            CommentEntity entity = commentRepository.findByBoardNumberAndCommentNumber(requestBody.boardNumber(),requestBody.commentNumber());
+            if(entity == null){
+                return PatchCommentResponseDTO.noExistComment();
+            }
+            if(!entity.getUserId().equals(userId)) return PatchCommentResponseDTO.noPermission();
+            entity.patchComment(requestBody);
+            commentRepository.save(entity);
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return PatchCommentResponseDTO.success();
+    }
+
+    @Override
     public ResponseEntity<? super DeleteBoardResponseDTO> deleteBoard(Long boardNumber, String userId) {
         try {
             boolean existedUser = userRepository.existsByUserId(userId);
@@ -304,5 +326,22 @@ public class BoardService implements IBoardService {
             return ResponseDTO.databaseError();
         }
         return DeleteBoardResponseDTO.success();
+    }
+
+    @Override
+    public ResponseEntity<? super DeleteCommentResponseDTO> deleteComment(Long boardNumber, Long commentNumber, String userId) {
+        try{
+            CommentEntity entity = commentRepository.findByBoardNumberAndCommentNumber(boardNumber,commentNumber);
+
+            if(entity == null){
+                return DeleteCommentResponseDTO.noExistComment();
+            }
+
+            commentRepository.delete(entity);
+        }catch (Exception e){
+            e.printStackTrace();
+            ResponseDTO.databaseError();
+        }
+        return DeleteCommentResponseDTO.success();
     }
 }

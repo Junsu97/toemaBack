@@ -27,7 +27,7 @@ public record TeacherListDTO(
                 teacherSubjectEntity.getEnglish(),
                 teacherSubjectEntity.getDesc(),
                 teacherSubjectEntity.getProfileImage(),
-                teacherSubjectEntity.getProfileImage());
+                teacherSubjectEntity.getSchool());
     }
 
     public static List<TeacherListDTO> getList(List<TeacherSubjectEntity> teacherSubjectEntities) {

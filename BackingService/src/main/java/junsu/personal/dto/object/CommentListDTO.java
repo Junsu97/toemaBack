@@ -8,13 +8,15 @@ import java.util.List;
 
 @Builder
 public record CommentListDTO(
+        Integer commentNumber,
+        Integer boardNumber,
         String nickname,
         String profileImage,
         String writeDatetime,
         String content
 ) {
     public CommentListDTO(GetCommentListResultSet resultSet){
-        this(resultSet.getNickname(), resultSet.getProfileImage(), resultSet.getWriteDatetime(), resultSet.getContent());
+        this(resultSet.getCommentNumber(), resultSet.getBoardNumber(), resultSet.getNickname(), resultSet.getProfileImage(), resultSet.getWriteDatetime(), resultSet.getContent());
     }
     public static List<CommentListDTO> copyList(List<GetCommentListResultSet> resultSets){
         List<CommentListDTO> list = new ArrayList<>();
