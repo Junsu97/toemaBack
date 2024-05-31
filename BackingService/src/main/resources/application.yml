@@ -1,5 +1,5 @@
 server:
-  port: 10000
+  port: 11000
 spring:
   profiles:
     active: prod
@@ -18,7 +18,7 @@ spring:
 #      password: 1234
 
     redis:
-      host: 192.168.131.133
+      host: 3.36.189.222
       port: 6379
       username: poly
       password: 1234
@@ -67,9 +67,6 @@ jwt:
       name: jwtAccessToken
   secret:
     key: '12345678123456781234567812345678123456781234'
-
-api:
-  gateway: localhost:13000
 
 univCert:
   api:

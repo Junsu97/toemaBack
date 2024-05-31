@@ -5,7 +5,9 @@ import junsu.personal.entity.primaryKey.MatchAndHomeworkPk;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface HomeworkRepository extends JpaRepository<HomeworkEntity, MatchAndHomeworkPk> {
-    HomeworkEntity findByTeacherIdAndStudentId(String teacherId, String studentId);
+    List<HomeworkEntity> findByTeacherIdAndStudentId(String teacherId, String studentId);
 }

@@ -17,6 +17,9 @@ public interface ResponseMessage {
     String NOT_EXISTED_COMMENT = "This Comment does not exist.";
     String NOT_EXISTED_APPLY = "This apply does not exist.";
 
+    String NOT_EXISTED_HOMEWORK = "This homework does not exist";
+    String NOT_EXISTED_TUTORING = "This tutoring does not exist";
+
     /** HTTP Status 401*/
     String SIGN_IN_FAIL = "Login information mismatch.";
     String AUTHORIZATION_FAIL = "Authorization Failed.";

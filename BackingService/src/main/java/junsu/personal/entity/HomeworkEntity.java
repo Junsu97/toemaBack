@@ -1,9 +1,7 @@
 package junsu.personal.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import junsu.personal.entity.primaryKey.MatchAndHomeworkPk;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -15,6 +13,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Table(name="HOMEWORK")
 @DynamicInsert
 @DynamicUpdate
+@IdClass(MatchAndHomeworkPk.class)
 @Builder
 public class HomeworkEntity {
     @Id

@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import junsu.personal.dto.request.auth.SignUpRequestDTO;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -62,4 +63,5 @@ public class StudentUserEntity {
 
     @Column(name = "ROLE")
     private String role;
+
 }

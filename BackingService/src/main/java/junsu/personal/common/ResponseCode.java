@@ -16,6 +16,9 @@ public interface ResponseCode {
     String NOT_EXISTED_APPLY = "NA";
     String NOT_EXISTED_COMMENT = "NC";
 
+    String NOT_EXISTED_HOMEWORK = "NH";
+    String NOT_EXISTED_TUTORING = "NT";
+
     /** HTTP Status 401*/
     String SIGN_IN_FAIL = "SF";
     String AUTHORIZATION_FAIL = "AF";
