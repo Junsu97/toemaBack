@@ -35,6 +35,9 @@ public class GetHomeworkResponseDTO extends ResponseDTO {
         ResponseDTO result = new ResponseDTO(ResponseCode.NOT_EXISTED_HOMEWORK, ResponseMessage.NOT_EXISTED_HOMEWORK);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
     }
-
+    public static ResponseEntity<ResponseDTO> noExistMatch(){
+        ResponseDTO result = new ResponseDTO(ResponseCode.NOT_EXISTED_MATCH, ResponseMessage.NOT_EXISTED_MATCH);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
 
 }

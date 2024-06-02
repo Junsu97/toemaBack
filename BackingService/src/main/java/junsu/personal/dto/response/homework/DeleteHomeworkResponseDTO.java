@@ -6,13 +6,11 @@ import junsu.personal.dto.response.ResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class PatchHomeworkResponseDTO extends ResponseDTO {
-    private PatchHomeworkResponseDTO(){
-        super(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-    }
+public class DeleteHomeworkResponseDTO extends ResponseDTO {
+    private DeleteHomeworkResponseDTO() {super(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);}
 
-    public static ResponseEntity<PatchHomeworkResponseDTO> success(){
-        PatchHomeworkResponseDTO result = new PatchHomeworkResponseDTO();
+    public static ResponseEntity<DeleteHomeworkResponseDTO> success() {
+        DeleteHomeworkResponseDTO result = new DeleteHomeworkResponseDTO();
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
@@ -20,9 +18,14 @@ public class PatchHomeworkResponseDTO extends ResponseDTO {
         ResponseDTO result = new ResponseDTO(ResponseCode.NOT_EXISTED_HOMEWORK, ResponseMessage.NOT_EXISTED_HOMEWORK);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
     }
+    public static ResponseEntity<ResponseDTO> noExistUser(){
+        ResponseDTO result = new ResponseDTO(ResponseCode.NOT_EXISTED_USER, ResponseMessage.NOT_EXISTED_USER);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+    }
 
     public static ResponseEntity<ResponseDTO> noPermission() {
         ResponseDTO result = new ResponseDTO(ResponseCode.NO_PERMISSION, ResponseMessage.NO_PERMISSION);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(result);
     }
+
 }

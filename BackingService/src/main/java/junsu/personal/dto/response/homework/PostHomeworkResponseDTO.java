@@ -21,4 +21,9 @@ public class PostHomeworkResponseDTO extends ResponseDTO {
         ResponseDTO result = new ResponseDTO(ResponseCode.NOT_EXISTED_USER, ResponseMessage.NOT_EXISTED_USER);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
+
+    public static ResponseEntity<ResponseDTO> noExistMatch(){
+        ResponseDTO result = new ResponseDTO(ResponseCode.NOT_EXISTED_MATCH, ResponseMessage.NOT_EXISTED_MATCH);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
 }

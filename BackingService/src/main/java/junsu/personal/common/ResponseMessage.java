@@ -18,6 +18,7 @@ public interface ResponseMessage {
     String NOT_EXISTED_APPLY = "This apply does not exist.";
 
     String NOT_EXISTED_HOMEWORK = "This homework does not exist";
+    String NOT_EXISTED_MATCH = "Does Not Matched";
     String NOT_EXISTED_TUTORING = "This tutoring does not exist";
 
     /** HTTP Status 401*/

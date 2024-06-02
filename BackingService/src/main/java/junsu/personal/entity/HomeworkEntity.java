@@ -1,6 +1,8 @@
 package junsu.personal.entity;
 
 import jakarta.persistence.*;
+import junsu.personal.dto.request.homework.PatchHomeworkRequestDTO;
+import junsu.personal.dto.request.homework.PostHomeworkRequestDTO;
 import junsu.personal.entity.primaryKey.MatchAndHomeworkPk;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -13,14 +15,18 @@ import org.hibernate.annotations.DynamicUpdate;
 @Table(name="HOMEWORK")
 @DynamicInsert
 @DynamicUpdate
-@IdClass(MatchAndHomeworkPk.class)
 @Builder
 public class HomeworkEntity {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "SEQ")
+    Long seq;
+
     @Column(name = "STUDENT_ID")
     String studentId;
 
-    @Id
+
     @Column(name = "TEACHER_ID")
     String teacherId;
 
@@ -38,6 +44,21 @@ public class HomeworkEntity {
 
     @NonNull
     @Column(name = "SUBMIT")
-    String submit;
+    Boolean submit;
 
+    public HomeworkEntity(PostHomeworkRequestDTO pDTO){
+        this.studentId = pDTO.studentId();
+        this.teacherId = pDTO.teacherId();;
+        this.startDate = pDTO.startDate();
+        this.endDate = pDTO.endDate();
+        this.content = pDTO.content();
+        this.submit = false;
+    }
+
+    public void patchHomework(PatchHomeworkRequestDTO pDTO){
+        this.startDate = pDTO.startDate();
+        this.endDate = pDTO.endDate();
+        this.content = pDTO.content();
+        this.submit = false;
+    }
 }

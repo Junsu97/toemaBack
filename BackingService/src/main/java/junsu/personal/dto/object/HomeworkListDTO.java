@@ -8,16 +8,17 @@ import java.util.List;
 
 @Builder
 public record HomeworkListDTO(
+        Long seq,
         String studentId,
         String teacherId,
         String startDate,
         String endDate,
         String content,
-        String submit
+        Boolean submit
 ) {
 
     public HomeworkListDTO(HomeworkEntity entity){
-        this(entity.getStudentId(), entity.getTeacherId(),
+        this(entity.getSeq(),entity.getStudentId(), entity.getTeacherId(),
                 entity.getStartDate(), entity.getEndDate(),
                 entity.getContent(), entity.getSubmit());
 

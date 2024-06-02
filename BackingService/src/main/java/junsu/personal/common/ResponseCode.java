@@ -17,6 +17,7 @@ public interface ResponseCode {
     String NOT_EXISTED_COMMENT = "NC";
 
     String NOT_EXISTED_HOMEWORK = "NH";
+    String NOT_EXISTED_MATCH = "NM";
     String NOT_EXISTED_TUTORING = "NT";
 
     /** HTTP Status 401*/
