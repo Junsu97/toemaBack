@@ -3,10 +3,7 @@ package junsu.personal.service.impl;
 import junsu.personal.dto.request.homework.PatchHomeworkRequestDTO;
 import junsu.personal.dto.request.homework.PostHomeworkRequestDTO;
 import junsu.personal.dto.response.ResponseDTO;
-import junsu.personal.dto.response.homework.DeleteHomeworkResponseDTO;
-import junsu.personal.dto.response.homework.GetHomeworkResponseDTO;
-import junsu.personal.dto.response.homework.PatchHomeworkResponseDTO;
-import junsu.personal.dto.response.homework.PostHomeworkResponseDTO;
+import junsu.personal.dto.response.homework.*;
 import junsu.personal.entity.HomeworkEntity;
 import junsu.personal.entity.MatchEntity;
 import junsu.personal.repository.HomeworkRepository;
@@ -31,36 +28,66 @@ public class HomeworkService implements IHomeworkService {
     private final StudentUserRepository studentUserRepository;
     private final TeacherUserRepository teacherUserRepository;
 
+
     @Override
-    public ResponseEntity<? super GetHomeworkResponseDTO> getHomework(String studentId, String teacherId) {
+    public ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkFromDate(String studentId, String teacherId, String date) {
         List<HomeworkEntity> homeworkEntities = new ArrayList<>();
         try{
             boolean existUser = studentUserRepository.existsByUserId(studentId) && teacherUserRepository.existsByUserId(teacherId);
-            if(!existUser) return GetHomeworkResponseDTO.noExistUser();
+            if(!existUser) return GetHomeworkListResponseDTO.noExistUser();
 
             MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
-            if(matchEntity == null) return GetHomeworkResponseDTO.noExistMatch();
+            if(matchEntity == null) return GetHomeworkListResponseDTO.noExistMatch();
 
-            homeworkEntities = homeworkRepository.findByTeacherIdAndStudentId(teacherId, studentId);
+            homeworkEntities = homeworkRepository.findByTeacherIdAndStudentIdAndStartDate(teacherId, studentId, date);
+
+            if(homeworkEntities.isEmpty() || homeworkEntities == null){
+                return GetHomeworkListResponseDTO.notExistHomework();
+            }
         }catch (Exception e){
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }
-        return GetHomeworkResponseDTO.success(homeworkEntities);
+        return GetHomeworkListResponseDTO.success(homeworkEntities);
     }
 
     @Override
-    public ResponseEntity<? super PostHomeworkResponseDTO> postHomework(PostHomeworkRequestDTO requestBody) {
+    public ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkList(String studentId, String teacherId) {
+        List<HomeworkEntity> homeworkEntities = new ArrayList<>();
+        try{
+            boolean existUser = studentUserRepository.existsByUserId(studentId) && teacherUserRepository.existsByUserId(teacherId);
+            if(!existUser) return GetHomeworkListResponseDTO.noExistUser();
+
+            MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
+            if(matchEntity == null) return GetHomeworkListResponseDTO.noExistMatch();
+
+            homeworkEntities = homeworkRepository.findByTeacherIdAndStudentId(teacherId, studentId);
+
+            if(homeworkEntities.isEmpty() || homeworkEntities == null){
+                return GetHomeworkListResponseDTO.notExistHomework();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return GetHomeworkListResponseDTO.success(homeworkEntities);
+    }
+
+    @Override
+    public ResponseEntity<? super PostHomeworkResponseDTO> postHomework(PostHomeworkRequestDTO requestBody,String userId) {
         try{
             String studentId = requestBody.studentId();
             String teacherId = requestBody.teacherId();
 
-            boolean existUser = studentUserRepository.existsByUserId(studentId) && teacherUserRepository.existsByUserId(teacherId);
-
-            MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
-            if(matchEntity == null) return GetHomeworkResponseDTO.noExistMatch();
+            if(!userId.equals(teacherId)){
+                return ResponseDTO.validationFailed();
+            }
+            boolean existUser = studentUserRepository.existsByUserId(studentId) && teacherUserRepository.existsByUserId(teacherId) && teacherUserRepository.existsByUserId(userId);
 
             if(!existUser) return PostHomeworkResponseDTO.noExistUser();
+
+            MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
+            if(matchEntity == null) return GetHomeworkListResponseDTO.noExistMatch();
 
             HomeworkEntity entity = new HomeworkEntity(requestBody);
             homeworkRepository.save(entity);

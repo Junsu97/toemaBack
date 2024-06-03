@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import junsu.personal.dto.request.homework.PatchHomeworkRequestDTO;
 import junsu.personal.dto.request.homework.PostHomeworkRequestDTO;
 import junsu.personal.dto.response.homework.DeleteHomeworkResponseDTO;
-import junsu.personal.dto.response.homework.GetHomeworkResponseDTO;
+import junsu.personal.dto.response.homework.GetHomeworkListResponseDTO;
 import junsu.personal.dto.response.homework.PatchHomeworkResponseDTO;
 import junsu.personal.dto.response.homework.PostHomeworkResponseDTO;
 import junsu.personal.service.impl.HomeworkService;
@@ -20,16 +20,24 @@ import org.springframework.web.bind.annotation.*;
 public class HomeworkController {
     private final HomeworkService homeworkService;
 
-    @GetMapping("{teacherUserId}/{studentUserId}")
-    public ResponseEntity<? super GetHomeworkResponseDTO> getHomework(@PathVariable String teacherUserId,
-                                                                      @PathVariable String studentUserId){
-        ResponseEntity<? super GetHomeworkResponseDTO> response = homeworkService.getHomework(studentUserId, teacherUserId);
+    @GetMapping("{teacherUserId}/{studentUserId}/list/{date}")
+    public ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkListFromDate(@PathVariable String teacherUserId,
+                                                                                      @PathVariable String studentUserId,
+                                                                                      @PathVariable String date){
+        ResponseEntity<? super GetHomeworkListResponseDTO> response = homeworkService.getHomeworkFromDate(studentUserId, teacherUserId, date);
+        return response;
+    }
+
+    @GetMapping("{teacherUserId}/{studentUserId}/list")
+    public ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkList(@PathVariable String teacherUserId,
+                                                                              @PathVariable String studentUserId){
+        ResponseEntity<? super GetHomeworkListResponseDTO> response = homeworkService.getHomeworkList(studentUserId, teacherUserId);
         return response;
     }
 
     @PostMapping("write")
-    public ResponseEntity<? super PostHomeworkResponseDTO> postHomework(@RequestBody @Valid PostHomeworkRequestDTO requestBody){
-        ResponseEntity<? super PostHomeworkResponseDTO> response = homeworkService.postHomework(requestBody);
+    public ResponseEntity<? super PostHomeworkResponseDTO> postHomework(@RequestBody @Valid PostHomeworkRequestDTO requestBody, @AuthenticationPrincipal String userId){
+        ResponseEntity<? super PostHomeworkResponseDTO> response = homeworkService.postHomework(requestBody, userId);
         return response;
     }
 

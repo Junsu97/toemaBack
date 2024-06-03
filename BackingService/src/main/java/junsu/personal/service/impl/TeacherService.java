@@ -33,10 +33,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class TeacherService implements ITeacherService {
-    private final TeacherSubjectRepository teacherSubjectRepository;
     private final MatchRepository matchRepository;
     private final EntityManager entityManager;
-    private final StudentUserRepository studentUserRepository;
     private final TeacherUserRepository teacherUserRepository;
     private final JPAQueryFactory queryFactory;
 

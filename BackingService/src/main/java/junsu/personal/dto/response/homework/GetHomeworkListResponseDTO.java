@@ -12,10 +12,10 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 @Getter
-public class GetHomeworkResponseDTO extends ResponseDTO {
+public class GetHomeworkListResponseDTO extends ResponseDTO {
 
     private List<HomeworkListDTO> homeworkList;
-    private GetHomeworkResponseDTO(List<HomeworkEntity> entities){
+    private GetHomeworkListResponseDTO(List<HomeworkEntity> entities){
         super(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
         this.homeworkList = HomeworkListDTO.getList(entities);
     }
@@ -25,8 +25,8 @@ public class GetHomeworkResponseDTO extends ResponseDTO {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
     }
 
-    public static ResponseEntity<GetHomeworkResponseDTO> success(List<HomeworkEntity> entities){
-        GetHomeworkResponseDTO result = new GetHomeworkResponseDTO(entities);
+    public static ResponseEntity<GetHomeworkListResponseDTO> success(List<HomeworkEntity> entities){
+        GetHomeworkListResponseDTO result = new GetHomeworkListResponseDTO(entities);
         return ResponseEntity.status(HttpStatus.OK).body(result);
 
     }
