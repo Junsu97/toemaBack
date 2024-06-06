@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface IHomeworkService {
     ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkFromDate(String studentId, String teacherId, String date);
+    ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkList(String studentId);
     ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkList(String studentId, String teacherId);
 
     ResponseEntity<? super PostHomeworkResponseDTO> postHomework(PostHomeworkRequestDTO requestBody, String userId);

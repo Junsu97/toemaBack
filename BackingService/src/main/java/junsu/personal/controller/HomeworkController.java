@@ -28,10 +28,16 @@ public class HomeworkController {
         return response;
     }
 
-    @GetMapping("{teacherUserId}/{studentUserId}/list")
+    @GetMapping("from-teacher/{teacherUserId}/{studentUserId}/list")
     public ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkList(@PathVariable String teacherUserId,
                                                                               @PathVariable String studentUserId){
         ResponseEntity<? super GetHomeworkListResponseDTO> response = homeworkService.getHomeworkList(studentUserId, teacherUserId);
+        return response;
+    }
+    @GetMapping("from-student/{studentUserId}/list")
+    public ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkList(
+                                                                              @PathVariable String studentUserId){
+        ResponseEntity<? super GetHomeworkListResponseDTO> response = homeworkService.getHomeworkList(studentUserId);
         return response;
     }
 

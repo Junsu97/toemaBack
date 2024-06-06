@@ -32,19 +32,37 @@ public class HomeworkService implements IHomeworkService {
     @Override
     public ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkFromDate(String studentId, String teacherId, String date) {
         List<HomeworkEntity> homeworkEntities = new ArrayList<>();
-        try{
+        try {
             boolean existUser = studentUserRepository.existsByUserId(studentId) && teacherUserRepository.existsByUserId(teacherId);
-            if(!existUser) return GetHomeworkListResponseDTO.noExistUser();
+            if (!existUser) return GetHomeworkListResponseDTO.noExistUser();
 
             MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
-            if(matchEntity == null) return GetHomeworkListResponseDTO.noExistMatch();
+            if (matchEntity == null) return GetHomeworkListResponseDTO.noExistMatch();
 
-            homeworkEntities = homeworkRepository.findByTeacherIdAndStudentIdAndStartDate(teacherId, studentId, date);
+            homeworkEntities = homeworkRepository.findByTeacherIdAndStudentIdAndStartDateOrderByStartDate(teacherId, studentId, date);
 
-            if(homeworkEntities.isEmpty() || homeworkEntities == null){
+            if (homeworkEntities.isEmpty() || homeworkEntities == null) {
                 return GetHomeworkListResponseDTO.notExistHomework();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return GetHomeworkListResponseDTO.success(homeworkEntities);
+    }
+
+    @Override
+    public ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkList(String studentId) {
+        List<HomeworkEntity> homeworkEntities = new ArrayList<>();
+        try {
+            boolean existUser = studentUserRepository.existsByUserId(studentId);
+            if (!existUser) return GetHomeworkListResponseDTO.noExistUser();
+
+            homeworkEntities = homeworkRepository.findByStudentIdOrderByStartDateAsc(studentId);
+            if (homeworkEntities.isEmpty() || homeworkEntities == null) {
+                return GetHomeworkListResponseDTO.notExistHomework();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }
@@ -54,19 +72,19 @@ public class HomeworkService implements IHomeworkService {
     @Override
     public ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkList(String studentId, String teacherId) {
         List<HomeworkEntity> homeworkEntities = new ArrayList<>();
-        try{
+        try {
             boolean existUser = studentUserRepository.existsByUserId(studentId) && teacherUserRepository.existsByUserId(teacherId);
-            if(!existUser) return GetHomeworkListResponseDTO.noExistUser();
+            if (!existUser) return GetHomeworkListResponseDTO.noExistUser();
 
             MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
-            if(matchEntity == null) return GetHomeworkListResponseDTO.noExistMatch();
+            if (matchEntity == null) return GetHomeworkListResponseDTO.noExistMatch();
 
-            homeworkEntities = homeworkRepository.findByTeacherIdAndStudentId(teacherId, studentId);
+            homeworkEntities = homeworkRepository.findByTeacherIdAndStudentIdOrderByStartDate(teacherId, studentId);
 
-            if(homeworkEntities.isEmpty() || homeworkEntities == null){
+            if (homeworkEntities.isEmpty() || homeworkEntities == null) {
                 return GetHomeworkListResponseDTO.notExistHomework();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }
@@ -74,25 +92,25 @@ public class HomeworkService implements IHomeworkService {
     }
 
     @Override
-    public ResponseEntity<? super PostHomeworkResponseDTO> postHomework(PostHomeworkRequestDTO requestBody,String userId) {
-        try{
+    public ResponseEntity<? super PostHomeworkResponseDTO> postHomework(PostHomeworkRequestDTO requestBody, String userId) {
+        try {
             String studentId = requestBody.studentId();
             String teacherId = requestBody.teacherId();
 
-            if(!userId.equals(teacherId)){
+            if (!userId.equals(teacherId)) {
                 return ResponseDTO.validationFailed();
             }
             boolean existUser = studentUserRepository.existsByUserId(studentId) && teacherUserRepository.existsByUserId(teacherId) && teacherUserRepository.existsByUserId(userId);
 
-            if(!existUser) return PostHomeworkResponseDTO.noExistUser();
+            if (!existUser) return PostHomeworkResponseDTO.noExistUser();
 
             MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
-            if(matchEntity == null) return GetHomeworkListResponseDTO.noExistMatch();
+            if (matchEntity == null) return PostHomeworkResponseDTO.noExistMatch();
 
             HomeworkEntity entity = new HomeworkEntity(requestBody);
             homeworkRepository.save(entity);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }
@@ -101,18 +119,18 @@ public class HomeworkService implements IHomeworkService {
 
     @Override
     public ResponseEntity<? super PatchHomeworkResponseDTO> patchHomework(PatchHomeworkRequestDTO requestBody, Long seq, String userId) {
-        try{
+        try {
             HomeworkEntity entity = homeworkRepository.findBySeq(seq);
-            if(entity == null){
+            if (entity == null) {
                 return PatchHomeworkResponseDTO.noExistHomework();
             }
 
-            if(!entity.getTeacherId().equals(userId)){
+            if (!entity.getTeacherId().equals(userId)) {
                 return PatchHomeworkResponseDTO.noPermission();
             }
             entity.patchHomework(requestBody);
             homeworkRepository.save(entity);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }
@@ -121,20 +139,20 @@ public class HomeworkService implements IHomeworkService {
 
     @Override
     public ResponseEntity<? super DeleteHomeworkResponseDTO> deleteHomework(Long seq, String userId) {
-        try{
+        try {
             boolean existedUser = homeworkRepository.existsByTeacherId(userId);
-            if(!existedUser) return DeleteHomeworkResponseDTO.noExistUser();
+            if (!existedUser) return DeleteHomeworkResponseDTO.noExistUser();
 
             HomeworkEntity entity = homeworkRepository.findBySeq(seq);
-            if(entity == null) return DeleteHomeworkResponseDTO.noExistHomework();
+            if (entity == null) return DeleteHomeworkResponseDTO.noExistHomework();
 
             String teacherId = entity.getTeacherId();
             boolean isTeacher = teacherId.equals(userId);
 
-            if(!isTeacher) return DeleteHomeworkResponseDTO.noPermission();
+            if (!isTeacher) return DeleteHomeworkResponseDTO.noPermission();
 
             homeworkRepository.delete(entity);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }

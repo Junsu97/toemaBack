@@ -19,6 +19,7 @@ public interface ResponseCode {
     String NOT_EXISTED_HOMEWORK = "NH";
     String NOT_EXISTED_MATCH = "NM";
     String NOT_EXISTED_TUTORING = "NT";
+    String EXIST_TUTORING = "ET";
 
     /** HTTP Status 401*/
     String SIGN_IN_FAIL = "SF";
