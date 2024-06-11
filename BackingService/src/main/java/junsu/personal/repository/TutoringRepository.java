@@ -15,7 +15,7 @@ public interface TutoringRepository extends JpaRepository<TutoringEntity, Long> 
 
     Boolean existsByTeacherId(String userId);
 
-    List<TutoringEntity> findByTeacherIdAndStudentIdOrderByTutoringDateAscTutoringTimeAsc(String teacherId, String studentId);
+    List<TutoringEntity> findByTeacherIdAndStudentIdOrderByTutoringDateAscTutoringDateAsc(String teacherId, String studentId);
 
-    List<TutoringEntity> findByStudentIdOrderByTutoringDateAscTutoringTimeAsc(String userId);
+    List<TutoringEntity> findByStudentIdOrderByTutoringDateAscTutoringStartTimeAsc(String userId);
 }

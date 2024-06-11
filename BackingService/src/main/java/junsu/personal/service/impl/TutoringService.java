@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class TutoringService implements ITutoringService {
             boolean existUser = studentUserRepository.existsByUserId(studentId);
             if(!existUser) return GetTutoringListResponseDTO.noExistUser();
 
-            tutoringEntities = tutoringRepository.findByStudentIdOrderByTutoringDateAscTutoringTimeAsc(studentId);
+            tutoringEntities = tutoringRepository.findByStudentIdOrderByTutoringDateAscTutoringStartTimeAsc(studentId);
 
             if(tutoringEntities.isEmpty() || tutoringEntities == null){
                 return GetTutoringListResponseDTO.noExistTutoring();
@@ -57,7 +59,7 @@ public class TutoringService implements ITutoringService {
             MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
             if(matchEntity == null) return GetTutoringListResponseDTO.noExistMatch();
 
-            tutoringEntities = tutoringRepository.findByTeacherIdAndStudentIdOrderByTutoringDateAscTutoringTimeAsc(teacherId, studentId);
+            tutoringEntities = tutoringRepository.findByTeacherIdAndStudentIdOrderByTutoringDateAscTutoringDateAsc(teacherId, studentId);
 
             if(tutoringEntities.isEmpty() || tutoringEntities == null){
                 return GetTutoringListResponseDTO.noExistTutoring();
@@ -86,7 +88,13 @@ public class TutoringService implements ITutoringService {
 
             TutoringEntity tmp = tutoringRepository.findByStudentIdAndTutoringDate(studentId, requestBody.tutoringDate());
             if(tmp != null){
-
+                LocalTime tmpStartDateTime = LocalTime.parse(tmp.getTutoringStartTime());
+                LocalTime tmpEndDateTime = LocalTime.parse(tmp.getTutoringEndTime());
+                LocalTime requestBodyStartDateTime = LocalTime.parse(requestBody.tutoringStartTime());
+                LocalTime requestBodyEndDateTime = LocalTime.parse(requestBody.tutoringEndTime());
+                if((tmpStartDateTime.isAfter(requestBodyStartDateTime) && tmpEndDateTime.isBefore(requestBodyStartDateTime)) || (tmpStartDateTime.isAfter(requestBodyEndDateTime) && tmpEndDateTime.isBefore(requestBodyEndDateTime))){
+                    return PostTutoringResponseDTO.existTutoring();
+                }
             }
 
             TutoringEntity entity = new TutoringEntity(requestBody);
@@ -105,6 +113,17 @@ public class TutoringService implements ITutoringService {
             if(entity == null) return PatchTutoringResponseDTO.noExistTutoring();
 
             if(!entity.getTeacherId().equals(userId)) return PatchTutoringResponseDTO.noPermission();
+
+            TutoringEntity tmp = tutoringRepository.findByStudentIdAndTutoringDate(entity.getStudentId(), requestBody.tutoringDate());
+            if(tmp != null){
+                LocalDateTime tmpStartDateTime = LocalDateTime.parse(tmp.getTutoringStartTime());
+                LocalDateTime tmpEndDateTime = LocalDateTime.parse(tmp.getTutoringEndTime());
+                LocalDateTime requestBodyStartDateTime = LocalDateTime.parse(requestBody.tutoringStartTime());
+//                LocalDateTime requestBodyEndDateTime = LocalDateTime.parse(requestBody.tutoringEndTime());
+                if(tmpStartDateTime.isAfter(requestBodyStartDateTime) && tmpEndDateTime.isBefore(requestBodyStartDateTime)){
+                    return PostTutoringResponseDTO.existTutoring();
+                }
+            }
 
             entity.patchTutoring(requestBody);
             tutoringRepository.save(entity);

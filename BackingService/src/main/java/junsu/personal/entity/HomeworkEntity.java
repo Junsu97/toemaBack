@@ -21,30 +21,30 @@ public class HomeworkEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SEQ")
-    Long seq;
+    private Long seq;
 
     @Column(name = "STUDENT_ID")
-    String studentId;
+    private String studentId;
 
 
     @Column(name = "TEACHER_ID")
-    String teacherId;
+    private String teacherId;
 
     @NonNull
     @Column(name = "START_DATE")
-    String startDate;
+    private String startDate;
 
     @NonNull
     @Column(name = "END_DATE")
-    String endDate;
+    private String endDate;
 
     @NonNull
     @Column(name = "CONTENT")
-    String content;
+    private String content;
 
     @NonNull
     @Column(name = "SUBMIT")
-    Boolean submit;
+    private Boolean submit;
 
     public HomeworkEntity(PostHomeworkRequestDTO pDTO){
         this.studentId = pDTO.studentId();

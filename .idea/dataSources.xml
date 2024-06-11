@@ -22,5 +22,12 @@
       <jdbc-url>jdbc:redis://3.36.189.222:6379/0</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="myDB@kopo-traine-my-mariadb-d1a2d-24496524-f0b2ca1b55d7.kr.lb.naverncp.com" uuid="d3f1dfce-7d41-4a98-8c14-36b3d94ff1cc">
+      <driver-ref>mariadb</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mariadb://kopo-traine-my-mariadb-d1a2d-24496524-f0b2ca1b55d7.kr.lb.naverncp.com:3306/myDB</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

@@ -18,14 +18,14 @@ import org.hibernate.annotations.DynamicUpdate;
 public class MatchEntity {
     @Id
     @Column(name = "STUDENT_ID")
-    String studentId;
+    private String studentId;
     @Id
     @Column(name = "TEACHER_ID")
-    String teacherId;
+    private String teacherId;
     @Column(name = "STATUS")
-    String status;
+    private String status;
     @Column(name = "CONTENT")
-    String content;
+    private String content;
     @Column(name = "WRITE_DATETIME")
     private String writeDatetime;
 }
