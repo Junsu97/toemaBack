@@ -5,6 +5,8 @@ import com.mongodb.client.MongoCollection;
 import junsu.personal.auth.UserType;
 import junsu.personal.dto.request.auth.faceId.PostFaceIDRequestDTO;
 import junsu.personal.dto.request.auth.faceId.PostFaceIdSignInRequestDTO;
+import junsu.personal.dto.request.chat.ChatMessageRequest;
+import junsu.personal.entity.domain.ChatMessageDomain;
 import junsu.personal.persistance.AbstractMongoDBCommon;
 import junsu.personal.persistance.IMongoMapper;
 import lombok.RequiredArgsConstructor;
@@ -36,4 +38,5 @@ public class MongoMapper extends AbstractMongoDBCommon implements IMongoMapper {
         log.info(this.getClass().getName() + ".insertFaceId End!!!");
         return res;
     }
+
 }

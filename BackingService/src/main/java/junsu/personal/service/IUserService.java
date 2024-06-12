@@ -25,5 +25,5 @@ public interface IUserService {
     ResponseEntity<? super PatchPasswordResponseDTO> patchPassword(PatchPasswordRequestDTO pDTO, String userId);
     ResponseEntity<? super PatchProfileImageResponseDTO> patchProfileImage(PatchProfileImageRequestDTO pDTO, String userId);
 
-    ResponseEntity<? super DeleteUserResponseDTO> deleteUser(DeleteUserRequestDTO pDTO, String userId);
+    ResponseEntity<? super DeleteUserResponseDTO> deleteUser(String userType, String userId);
 }

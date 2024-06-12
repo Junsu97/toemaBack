@@ -15,6 +15,7 @@ import junsu.personal.dto.response.user.*;
 import junsu.personal.entity.*;
 import junsu.personal.persistance.IMyRedisMapper;
 import junsu.personal.repository.*;
+import junsu.personal.service.IBoardService;
 import junsu.personal.service.IFileService;
 import junsu.personal.service.IUserService;
 import junsu.personal.util.EncryptUtil;
@@ -39,6 +40,7 @@ public class UserService implements IUserService {
     private final TeacherUserRepository teacherUserRepository;
     private final TeacherSubjectRepository teacherSubjectRepository;
     private final BoardRepository boardRepository;
+    private final IBoardService boardService;
     private final ImageRepository imageRepository;
     private final FavoriteRepository favoriteRepository;
     private final CommentRepository commentRepository;
@@ -390,18 +392,53 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public ResponseEntity<? super DeleteUserResponseDTO> deleteUser(DeleteUserRequestDTO pDTO, String userId) {
+    public ResponseEntity<? super DeleteUserResponseDTO> deleteUser(String userType, String userId) {
         try{
-            if(pDTO.userType().equals(UserType.STUDENT.getValue())){
+            if(userType.equals(UserType.STUDENT.getValue())){
+                StudentUserEntity userEntity = studentUserRepository.findByUserId(userId);
+                if(userEntity == null){
+                    return DeleteUserResponseDTO.notExistUser();
+                }
                 List<FavoriteEntity> favoriteEntities = favoriteRepository.findAllByUserId(userId);
-
+                if(favoriteEntities.size() != 0){
+                    for(FavoriteEntity entity : favoriteEntities){
+                        favoriteRepository.delete(entity);
+                    }
+                }
+                List<CommentEntity> commentEntities = commentRepository.findAllByUserId(userId);
+                if(commentEntities.size() != 0){
+                    for(CommentEntity entity : commentEntities){
+                        commentRepository.delete(entity);
+                    }
+                }
                 List<BoardEntity> boardEntities = boardRepository.findAllByWriterId(userId);
                 if(boardEntities.size() != 0){
-
+                    for(BoardEntity entity : boardEntities){
+                        boardService.deleteBoard(entity.getBoardNumber(), entity.getWriterId());
+                    }
                 }
 
-            }else{
+                studentUserRepository.delete(userEntity);
 
+            }else{
+                List<FavoriteEntity> favoriteEntities = favoriteRepository.findAllByUserId(userId);
+                if(favoriteEntities.size() != 0){
+                    for(FavoriteEntity entity : favoriteEntities){
+                        favoriteRepository.delete(entity);
+                    }
+                }
+                List<CommentEntity> commentEntities = commentRepository.findAllByUserId(userId);
+                if(commentEntities.size() != 0){
+                    for(CommentEntity entity : commentEntities){
+                        commentRepository.delete(entity);
+                    }
+                }
+                TeacherUserEntity userEntity = teacherUserRepository.findByUserId(userId);
+                if(userEntity == null){
+                    return DeleteUserResponseDTO.notExistUser();
+                }
+
+                teacherUserRepository.delete(userEntity);
             }
         }catch (Exception e){
             e.printStackTrace();

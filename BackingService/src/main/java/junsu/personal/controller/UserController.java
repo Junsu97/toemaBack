@@ -2,6 +2,7 @@ package junsu.personal.controller;
 
 import jakarta.validation.Valid;
 import junsu.personal.dto.request.user.*;
+import junsu.personal.dto.response.auth.DeleteUserResponseDTO;
 import junsu.personal.dto.response.user.*;
 import junsu.personal.service.IFileService;
 import junsu.personal.service.IUserService;
@@ -129,6 +130,12 @@ public class UserController {
             @AuthenticationPrincipal String userId
     ){
         ResponseEntity<? super PostCheckPasswrodResponseDTO> response = userService.postCheckPassword(requestBody, userId);
+        return response;
+    }
+
+    @DeleteMapping("/delete/{userType}")
+    public ResponseEntity<? super DeleteUserResponseDTO> deleteUser(@PathVariable String userType, @AuthenticationPrincipal String userId){
+        ResponseEntity<? super DeleteUserResponseDTO> response = userService.deleteUser(userType,userId);
         return response;
     }
 }

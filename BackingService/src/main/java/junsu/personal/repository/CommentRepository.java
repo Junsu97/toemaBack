@@ -36,6 +36,8 @@ public interface CommentRepository extends JpaRepository<CommentEntity, CommentP
 
     Long countByBoardNumber(Long boardNumber);
 
+    List<CommentEntity> findAllByUserId(String userId);
+
     @Transactional
     void deleteByBoardNumber(Long boardNumber);
 }

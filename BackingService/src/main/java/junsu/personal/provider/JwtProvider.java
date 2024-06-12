@@ -1,8 +1,6 @@
 package junsu.personal.provider;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +55,27 @@ public class JwtProvider {
         }
 
         return claims.getSubject();
+    }
+
+    public boolean validateAccessToken(String accessToken){
+        if(accessToken == null){
+            return false;
+        }
+        String bearerToken = accessToken.trim();
+
+        if(!bearerToken.trim().isEmpty() && bearerToken.startsWith("Bearer ")){
+            accessToken = bearerToken.substring(7);
+            try{
+                Claims claims =Jwts.parser()
+                        .setSigningKey(secretKey)
+                        .parseClaimsJws(accessToken)
+                        .getBody();
+                return true;
+            } catch (ExpiredJwtException | MalformedJwtException e){
+                return false;
+            }
+        }
+        return false;
     }
 
 
