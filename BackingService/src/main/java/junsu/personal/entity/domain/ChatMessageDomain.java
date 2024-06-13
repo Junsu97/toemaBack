@@ -2,11 +2,8 @@ package junsu.personal.entity.domain;
 
 import jakarta.persistence.Id;
 import junsu.personal.dto.object.ChatMessageListDTO;
-import junsu.personal.dto.request.chat.ChatMessageRequest;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;

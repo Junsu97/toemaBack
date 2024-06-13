@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import junsu.personal.dto.object.ChatMessageListDTO;
-import junsu.personal.dto.request.chat.ChatMessageRequest;
+import junsu.personal.entity.domain.ChatMessageDomain;
+import junsu.personal.service.IChatService;
 import junsu.personal.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -23,145 +25,152 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class ChatHandler extends TextWebSocketHandler {
+
     @Value("${jwt.secret.key}")
-    private final String secretKey;
+    private String secretKey;
 
     private static Set<WebSocketSession> clients = Collections.synchronizedSet(new LinkedHashSet<>());
-    private static Map<String, String> roomInfo = Collections.synchronizedMap(new LinkedHashMap<>());
+    public static Map<String, String> roomInfo = Collections.synchronizedMap(new LinkedHashMap<>());
+    private final IChatService chatService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        log.info(this.getClass().getName() + ".afterConnectionEstablished start!!!");
-        String jwt = this.getQueryParam(session.getUri(), "token");
+        log.info("Connection established: {}", session.getId());
+        String jwt = getQueryParam(session.getUri(), "token");
         if (jwt != null && validateToken(jwt)) {
             String roomName = CmmUtil.nvl((String) session.getAttributes().get("roomName"));
             String userId = CmmUtil.nvl((String) session.getAttributes().get("userId"));
             String roomNameHash = CmmUtil.nvl((String) session.getAttributes().get("roomNameHash"));
 
-            log.info("roomName : " + roomName);
-            log.info("userId : " + userId);
-            log.info("roomNameHash : " + roomNameHash);
+            log.info("roomName: {}, userId: {}, roomNameHash: {}", roomName, userId, roomNameHash);
 
-            if(!clients.contains(session)){
+            if (!clients.contains(session)) {
                 clients.add(session);
                 roomInfo.put(roomName, roomNameHash);
+            }else{
+                String d = roomInfo.get(roomName);
+                log.info("ChatHandler roomInfo : " + d);
             }
 
-            clients.forEach(s -> {
-                if (roomNameHash.equals(s.getAttributes().get("roomNameHash"))) {
-                    try {
-                        ChatMessageListDTO cDTO = ChatMessageListDTO.builder()
-                                .userId("관리자")
-                                .message(userId + "님이 채팅방에 입장하셨습니다.")
-                                .timestamp(formatTimestamp(new Date()))
-                                .build();
+            broadcastMessage(roomNameHash, userId + "님이 채팅방에 입장하셨습니다.", "관리자");
 
-                        String json = new ObjectMapper().writeValueAsString(cDTO);
-                        log.info("json : " + json);
 
-                        TextMessage chatMsg = new TextMessage(json);
-                        s.sendMessage(chatMsg);
+            List<ChatMessageDomain> recentMessage = chatService.getRecentMessage(roomName);
+            ObjectMapper objectMapper = new ObjectMapper();
 
-                        cDTO = null;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            for(ChatMessageDomain message : recentMessage){
+                ChatMessageListDTO cDTO = ChatMessageListDTO.builder()
+                        .userId(message.getUserId())
+                        .timestamp(formatTimestamp(message.getTimestamp()))
+                        .message(message.getMessage())
+                        .build();
+
+                String json = objectMapper.writeValueAsString(cDTO);
+                session.sendMessage(new TextMessage(json));
+            }
+
+                log.info(roomInfo.keySet().toString());
+
+
 
         } else {
             session.close(CloseStatus.NOT_ACCEPTABLE);
+            log.info("Not Valid Token");
         }
-
-
-        log.info(this.getClass().getName() + ".afterConnectionEstablished end!!!");
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        log.info(this.getClass().getName() + ".handleTextMessage start!!!");
-        String jwt = this.getQueryParam(session.getUri(), "token");
+        log.info("Message received from: {}", session.getId());
+        String jwt = getQueryParam(session.getUri(), "token");
         if (jwt != null && validateToken(jwt)) {
             String roomName = CmmUtil.nvl((String) session.getAttributes().get("roomName"));
             String userId = CmmUtil.nvl((String) session.getAttributes().get("userId"));
             String roomNameHash = CmmUtil.nvl((String) session.getAttributes().get("roomNameHash"));
 
-            log.info("roomName : " + roomName);
-            log.info("userId : " + userId);
-            log.info("roomNameHash : " + roomNameHash);
+            log.info("roomName: {}, userId: {}, roomNameHash: {}", roomName, userId, roomNameHash);
 
             String msg = CmmUtil.nvl(message.getPayload());
-            log.info("msg : msg");
+            log.info("Message payload: {}", msg);
 
             ChatMessageListDTO cDTO = new ObjectMapper().readValue(msg, ChatMessageListDTO.class);
+            cDTO = cDTO.toBuilder().timestamp(formatTimestamp(new Date())).build();
 
-            cDTO.toBuilder().timestamp(formatTimestamp(new Date())).build();
+            broadcastMessage(roomNameHash, cDTO, userId, roomName);
 
-            String json = new ObjectMapper().writeValueAsString(cDTO);
-
-            log.info("json : " + json);
-
-            clients.forEach(s -> {
-                if (roomNameHash.equals(s.getAttributes().get("roomNameHash"))) {
-                    try {
-                        TextMessage chatMsg = new TextMessage(json);
-                        s.sendMessage(chatMsg);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        }else{
+        } else {
             session.close(CloseStatus.NOT_ACCEPTABLE);
         }
-        log.info(this.getClass().getName() + ".handleTextMessage end!!!");
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        log.info(this.getClass().getName() + ".afterConnectionClosed start!!!");
-        String jwt = this.getQueryParam(session.getUri(), "token");
+        log.info("Connection closed: {}", session.getId());
+        String jwt = getQueryParam(session.getUri(), "token");
         if (jwt != null && validateToken(jwt)) {
             String roomName = CmmUtil.nvl((String) session.getAttributes().get("roomName"));
             String userId = CmmUtil.nvl((String) session.getAttributes().get("userId"));
             String roomNameHash = CmmUtil.nvl((String) session.getAttributes().get("roomNameHash"));
 
-            log.info("roomName : " + roomName);
-            log.info("userId : " + userId);
-            log.info("roomNameHash : " + roomNameHash);
+            log.info("roomName: {}, userId: {}, roomNameHash: {}", roomName, userId, roomNameHash);
 
             clients.remove(session);
+
+            broadcastMessage(roomNameHash, userId + "님이 채팅방을 떠났습니다.", "관리자");
+
+        } else {
+            session.close(CloseStatus.NOT_ACCEPTABLE);
+        }
+    }
+
+    private void broadcastMessage(String roomNameHash, String message, String sender) {
+        ChatMessageListDTO cDTO = ChatMessageListDTO.builder()
+                .userId(sender)
+                .message(message)
+                .timestamp(formatTimestamp(new Date()))
+                .build();
+
+        try {
+            String json = new ObjectMapper().writeValueAsString(cDTO);
+            log.info("Broadcasting message: {}", json);
 
             clients.forEach(s -> {
                 if (roomNameHash.equals(s.getAttributes().get("roomNameHash"))) {
                     try {
-                        ChatMessageListDTO cDTO = ChatMessageListDTO.builder()
-                                .userId("관리자")
-                                .message(userId + "님이 채팅방을 떠났습니다.")
-                                .timestamp(formatTimestamp(new Date()))
-                                .build();
-
-                        String json = new ObjectMapper().writeValueAsString(cDTO);
-                        log.info("json : " + json);
-
-                        TextMessage chatMsg = new TextMessage(json);
-                        s.sendMessage(chatMsg);
-
-                        cDTO = null;
+                        s.sendMessage(new TextMessage(json));
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("Error sending message: ", e);
                     }
                 }
             });
-        } else{
-            session.close(CloseStatus.NOT_ACCEPTABLE);
+        } catch (Exception e) {
+            log.error("Error broadcasting message: ", e);
         }
-        log.info(this.getClass().getName() + ".afterConnectionClosed end!!!");
     }
 
-    private static String formatTimestamp(Date timestamp) {
+    private void broadcastMessage(String roomNameHash, ChatMessageListDTO cDTO, String userId, String roomName) {
+        try {
+            String json = new ObjectMapper().writeValueAsString(cDTO);
+            log.info("Broadcasting message: {}", json);
+
+            clients.forEach(s -> {
+                if (roomNameHash.equals(s.getAttributes().get("roomNameHash"))) {
+                    try {
+                        s.sendMessage(new TextMessage(json));
+                        chatService.postChat(cDTO, userId, roomName);
+                    } catch (Exception e) {
+                        log.error("Error sending message: ", e);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            log.error("Error broadcasting message: ", e);
+        }
+    }
+
+    private String formatTimestamp(Date timestamp) {
         if (timestamp == null) {
-            return null; // 또는 기본값을 반환하도록 설정할 수 있습니다.
+            return null;
         }
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return formatter.format(timestamp);
@@ -173,7 +182,7 @@ public class ChatHandler extends TextWebSocketHandler {
                     .setSigningKey(secretKey)
                     .parseClaimsJws(token)
                     .getBody();
-            return true; // 추가 검증 로직 필요 시 여기에 추가
+            return true;
         } catch (Exception e) {
             return false;
         }

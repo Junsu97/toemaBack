@@ -7,5 +7,5 @@ import java.util.Date;
 import java.util.List;
 
 public interface MongoChatMessageRepository extends MongoRepository<ChatMessageDomain, String> {
-    List<ChatMessageDomain> findByTimestampAfter(Date timestamp);
+    List<ChatMessageDomain> findByRoomNameAndTimestampAfter(String roomName, Date timestamp);
 }
