@@ -3,7 +3,6 @@ package junsu.personal.service.impl;
 import junsu.personal.dto.object.ChatMessageListDTO;
 import junsu.personal.dto.request.chat.PostChatRoomRequest;
 import junsu.personal.dto.response.ResponseDTO;
-import junsu.personal.dto.response.chat.PostChatResponseDTO;
 import junsu.personal.dto.response.chat.PostChatRoomResponseDTO;
 import junsu.personal.entity.ChatRoomEntity;
 import junsu.personal.entity.domain.ChatMessageDomain;

@@ -47,11 +47,15 @@ public class BoardEntity {
     @NonNull
     @Column(name="VIEW_COUNT")
     private Long viewCount;
+
+    @NonNull
+    @Column(name = "WRITER_NICKNAME")
+    private String writerNickname;
     @NonNull
     @Column(name = "WRITER_ID")
     private String writerId;
 
-    public BoardEntity(PostBoardRequestDTO pDTO, String userId){
+    public BoardEntity(PostBoardRequestDTO pDTO, String userId, String writerNickname){
 
         Date now = Date.from(Instant.now());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -64,6 +68,7 @@ public class BoardEntity {
         this.commentCount = 0L;
         this.viewCount = 0L;
         this.writerId = userId;
+        this.writerNickname = writerNickname;
     }
 
     public void increaseViewCount(){

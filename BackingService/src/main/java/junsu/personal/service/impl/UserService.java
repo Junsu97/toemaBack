@@ -2,7 +2,6 @@ package junsu.personal.service.impl;
 
 import junsu.personal.auth.UserType;
 import junsu.personal.dto.object.MailDTO;
-import junsu.personal.dto.request.auth.DeleteUserRequestDTO;
 import junsu.personal.dto.request.user.PostMailReceiveRequestDTO;
 import junsu.personal.dto.request.user.PostMailSendRequestDTO;
 import junsu.personal.dto.request.user.*;
@@ -13,8 +12,12 @@ import junsu.personal.dto.response.user.PostMailSendResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.dto.response.user.*;
 import junsu.personal.entity.*;
+import junsu.personal.entity.domain.StudentFaceIdDomain;
+import junsu.personal.entity.domain.TeacherFaceIdDomain;
 import junsu.personal.persistance.IMyRedisMapper;
 import junsu.personal.repository.*;
+import junsu.personal.repository.mongo.MongoStudentFaceIdRepository;
+import junsu.personal.repository.mongo.MongoTeacherFaceIdRepository;
 import junsu.personal.service.IBoardService;
 import junsu.personal.service.IFileService;
 import junsu.personal.service.IUserService;
@@ -41,12 +44,11 @@ public class UserService implements IUserService {
     private final TeacherSubjectRepository teacherSubjectRepository;
     private final BoardRepository boardRepository;
     private final IBoardService boardService;
-    private final ImageRepository imageRepository;
+
     private final FavoriteRepository favoriteRepository;
     private final CommentRepository commentRepository;
-    private final SearchLogRepository searchLogRepository;
-    private final BoardListViewRepository boardListViewRepository;
-    private final IFileService fileService;
+    private final MongoStudentFaceIdRepository mongoStudentFaceIdRepository;
+    private final MongoTeacherFaceIdRepository mongoTeacherFaceIdRepository;
     private final JavaMailSender javaMailSender;
     private final IMyRedisMapper myRedisMapper;
     @Value("${spring.mail.username}")
@@ -417,6 +419,13 @@ public class UserService implements IUserService {
                         boardService.deleteBoard(entity.getBoardNumber(), entity.getWriterId());
                     }
                 }
+                StudentFaceIdDomain faceIdDomain = mongoStudentFaceIdRepository.findByUserId(userId);
+                if(faceIdDomain != null){
+                    log.info("있음");
+                    mongoStudentFaceIdRepository.delete(faceIdDomain);
+                }else{
+                    log.info("없음");
+                }
 
                 studentUserRepository.delete(userEntity);
 
@@ -436,6 +445,11 @@ public class UserService implements IUserService {
                 TeacherUserEntity userEntity = teacherUserRepository.findByUserId(userId);
                 if(userEntity == null){
                     return DeleteUserResponseDTO.notExistUser();
+                }
+
+                TeacherFaceIdDomain faceIdDomain = mongoTeacherFaceIdRepository.findByUserId(userId);
+                if(faceIdDomain != null){
+                    mongoTeacherFaceIdRepository.delete(faceIdDomain);
                 }
 
                 teacherUserRepository.delete(userEntity);

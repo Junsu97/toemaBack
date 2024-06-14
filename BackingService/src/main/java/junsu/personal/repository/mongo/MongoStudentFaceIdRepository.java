@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MongoStudentFaceIdRepository extends MongoRepository<StudentFaceIdDomain, String> {
+    StudentFaceIdDomain findByUserId(String userId);
 }

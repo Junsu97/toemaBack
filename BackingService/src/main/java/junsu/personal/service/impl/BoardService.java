@@ -160,9 +160,9 @@ public class BoardService implements IBoardService {
     public ResponseEntity<? super PostBoardRResponseDTO> postBoard(PostBoardRequestDTO pDTO, String userId) {
         try {
             boolean existedUserId = userRepository.existsByUserId(userId);
-
+            String nickname = userRepository.findByUserId(userId).getNickname();
             if (!existedUserId) return PostBoardRResponseDTO.notExistUser();
-            BoardEntity boardEntity = new BoardEntity(pDTO, userId);
+            BoardEntity boardEntity = new BoardEntity(pDTO, userId, nickname);
             boardRepository.save(boardEntity);
 
             long boardNumber = boardEntity.getBoardNumber();

@@ -12,7 +12,6 @@ import junsu.personal.dto.response.auth.SignInResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.dto.response.auth.faceId.PostFaceIdResponseDTO;
 import junsu.personal.dto.response.auth.faceId.PostFaceIdSignInResponseDTO;
-import junsu.personal.dto.response.user.GetTeacherSubjectResponseDTO;
 import junsu.personal.entity.StudentUserEntity;
 import junsu.personal.entity.TeacherSubjectEntity;
 import junsu.personal.entity.TeacherUserEntity;
@@ -120,8 +119,9 @@ public class AuthService implements IAuthService {
                         .userId(userId)
                         .desc("")
                         .build();
-                teacherSubjectRepository.save(subjectEntity);
                 teacherUserRepository.save(teacherUserEntity);
+                teacherSubjectRepository.save(subjectEntity);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
