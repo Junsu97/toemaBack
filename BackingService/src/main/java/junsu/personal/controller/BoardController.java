@@ -51,6 +51,11 @@ public class BoardController {
         ResponseEntity<? super GetLatestBoardListResponseDTO> response = boardService.getLatestBoardList();
         return response;
     }
+    @GetMapping("/like-test/{userId}")
+    public ResponseEntity<? super GetLikeBoardListResponseDTO> getLikeBoardList(@PathVariable("userId") String userId){
+        ResponseEntity<? super GetLikeBoardListResponseDTO> response = boardService.getLikeBoardList(userId);
+        return response;
+    }
 
     @GetMapping("/top-3")
     public ResponseEntity<? super GetTop3BoardListResponseDTO> getTop3BoardList(){

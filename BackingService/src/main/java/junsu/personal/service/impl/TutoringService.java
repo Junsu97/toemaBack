@@ -53,7 +53,7 @@ public class TutoringService implements ITutoringService {
     public ResponseEntity<? super GetTutoringListResponseDTO> getTutoringList(String studentId, String teacherId) {
         List<TutoringEntity> tutoringEntities = new ArrayList<>();
         try{
-            boolean existUser = studentUserRepository.existsByUserId(studentId) && teacherUserRepository.existsByUserId(teacherId);
+            boolean existUser = studentUserRepository.existsByUserId(studentId) || teacherUserRepository.existsByUserId(teacherId);
             if(!existUser) return GetTutoringListResponseDTO.noExistUser();
 
             MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
@@ -80,7 +80,7 @@ public class TutoringService implements ITutoringService {
             if(!userId.equals(teacherId)){
                 return ResponseDTO.validationFailed();
             }
-            boolean existUser = studentUserRepository.existsByUserId(studentId) && teacherUserRepository.existsByUserId(teacherId) && teacherUserRepository.existsByUserId(userId);
+            boolean existUser = studentUserRepository.existsByUserId(studentId) || (teacherUserRepository.existsByUserId(teacherId) && teacherUserRepository.existsByUserId(userId));
             if(!existUser) return PostTutoringResponseDTO.noExistUser();
 
             MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 public interface IBoardService {
     ResponseEntity<? super GetBoardResponseDTO> getBoard(Long boardNumber);
     ResponseEntity<? super GetUserBoardListResponseDTO> getUserBoardList(String userId);
+    ResponseEntity<? super GetLikeBoardListResponseDTO> getLikeBoardList(String userId);
     ResponseEntity<? super GetLatestBoardListResponseDTO> getLatestBoardList();
     ResponseEntity<? super GetSearchBoardListResponseDTO> getSearchBoardList(String searchWord, String preSearchWord);
     ResponseEntity<? super GetTop3BoardListResponseDTO> getTop3BoardList();

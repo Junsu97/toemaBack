@@ -73,6 +73,28 @@ public class BoardService implements IBoardService {
     }
 
     @Override
+    public ResponseEntity<? super GetLikeBoardListResponseDTO> getLikeBoardList(String userId) {
+        List<BoardListViewEntity> boardListViewEntities = new ArrayList<>();
+        try{
+            boolean existedUser = userRepository.existsByUserId(userId) || teacherUserRepository.existsByUserId(userId);
+            if(!existedUser) return GetLikeBoardListResponseDTO.noExistUser();
+
+            List<FavoriteEntity> favoriteEntities = favoriteRepository.findByUserId(userId);
+            if(!favoriteEntities.isEmpty() && favoriteEntities != null){
+                for(FavoriteEntity entity : favoriteEntities){
+                    BoardListViewEntity boardListViewEntity = boardListViewRepository.findByBoardNumberOrderByWriteDatetimeDesc(entity.getBoardNumber());
+                    boardListViewEntities.add(boardListViewEntity);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseDTO.databaseError();
+        }
+        return GetLikeBoardListResponseDTO.success(boardListViewEntities);
+    }
+
+
+    @Override
     public ResponseEntity<? super GetLatestBoardListResponseDTO> getLatestBoardList() {
         List<BoardListViewEntity> boardListViewEntities = new ArrayList<>();
         try{

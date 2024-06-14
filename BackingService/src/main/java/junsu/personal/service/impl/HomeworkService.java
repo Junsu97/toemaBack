@@ -33,7 +33,7 @@ public class HomeworkService implements IHomeworkService {
     public ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkFromDate(String studentId, String teacherId, String date) {
         List<HomeworkEntity> homeworkEntities = new ArrayList<>();
         try {
-            boolean existUser = studentUserRepository.existsByUserId(studentId) && teacherUserRepository.existsByUserId(teacherId);
+            boolean existUser = studentUserRepository.existsByUserId(studentId) || teacherUserRepository.existsByUserId(teacherId);
             if (!existUser) return GetHomeworkListResponseDTO.noExistUser();
 
             MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
@@ -73,7 +73,7 @@ public class HomeworkService implements IHomeworkService {
     public ResponseEntity<? super GetHomeworkListResponseDTO> getHomeworkList(String studentId, String teacherId) {
         List<HomeworkEntity> homeworkEntities = new ArrayList<>();
         try {
-            boolean existUser = studentUserRepository.existsByUserId(studentId) && teacherUserRepository.existsByUserId(teacherId);
+            boolean existUser = studentUserRepository.existsByUserId(studentId) || teacherUserRepository.existsByUserId(teacherId);
             if (!existUser) return GetHomeworkListResponseDTO.noExistUser();
 
             MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId, studentId);
@@ -100,7 +100,7 @@ public class HomeworkService implements IHomeworkService {
             if (!userId.equals(teacherId)) {
                 return ResponseDTO.validationFailed();
             }
-            boolean existUser = studentUserRepository.existsByUserId(studentId) && teacherUserRepository.existsByUserId(teacherId) && teacherUserRepository.existsByUserId(userId);
+            boolean existUser = studentUserRepository.existsByUserId(studentId) || teacherUserRepository.existsByUserId(teacherId) && teacherUserRepository.existsByUserId(userId);
 
             if (!existUser) return PostHomeworkResponseDTO.noExistUser();
 
