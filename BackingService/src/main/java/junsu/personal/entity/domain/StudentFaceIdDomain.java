@@ -12,10 +12,14 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 public class StudentFaceIdDomain {
     @Id
+    private String id;
+
     @Field(name = "userId")
     private String userId;
+
     @Field(name = "accuracy")
-    double accuracy;
+    private double accuracy;
+
     @Field(name = "landMarks")
-    LandMark landMarks;
+    private LandMark landMarks;
 }
