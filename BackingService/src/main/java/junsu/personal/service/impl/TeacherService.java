@@ -183,9 +183,9 @@ public class TeacherService implements ITeacherService {
     }
 
     @Override
-    public ResponseEntity<? super GetApplyBeforeResponseDTO> getApplyBefore(String userId) {
+    public ResponseEntity<? super GetApplyBeforeResponseDTO> getApplyBefore(String teacherId,String userId) {
         try {
-            MatchEntity matchEntity = matchRepository.findByStudentId(userId);
+            MatchEntity matchEntity = matchRepository.findByTeacherIdAndStudentId(teacherId,userId);
             if (matchEntity != null) {
                 if (matchEntity.getStatus().equals("신청됨")|| matchEntity.getStatus().equals("승인됨"))
                     return GetApplyBeforeResponseDTO.duplicateApply();

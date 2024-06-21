@@ -14,6 +14,8 @@ public class GetUserResponseDTO extends ResponseDTO {
     private String userId;
     private String nickname;
     private String profileImage;
+    private String addr;
+    private String addrDetail;
     private String school;
     private Boolean emailAuth;
     private String userType;
@@ -25,6 +27,8 @@ public class GetUserResponseDTO extends ResponseDTO {
         this.profileImage = userEntity.getProfileImage();
         this.emailAuth = userEntity.getEmailAuth();
         this.school = userEntity.getSchool();
+        this.addr = userEntity.getAddr();
+        this.addrDetail = userEntity.getAddrDetail();
         this.userType = "STUDENT";
     }
     private GetUserResponseDTO(TeacherUserEntity userEntity){
@@ -34,6 +38,8 @@ public class GetUserResponseDTO extends ResponseDTO {
         this.profileImage = userEntity.getProfileImage();
         this.school = userEntity.getSchool();
         this.emailAuth = userEntity.getEmailAuth();
+        this.addr = userEntity.getAddr();
+        this.addrDetail = userEntity.getAddrDetail();
         this.userType = "TEACHER";
     }
 

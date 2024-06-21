@@ -292,6 +292,7 @@ public class BoardService implements IBoardService {
     @Override
     public ResponseEntity<? super IncreaseViewCountResponseDTO> increaseViewCount(Long boardNumber) {
         try {
+            log.info(".increaseViewCount Start!!!");
             BoardEntity boardEntity = boardRepository.findByBoardNumber(boardNumber);
             if (boardEntity == null) return IncreaseViewCountResponseDTO.noExistsBoard();
             boardEntity.increaseViewCount();
@@ -354,10 +355,14 @@ public class BoardService implements IBoardService {
     public ResponseEntity<? super DeleteCommentResponseDTO> deleteComment(Long boardNumber, Long commentNumber, String userId) {
         try{
             CommentEntity entity = commentRepository.findByBoardNumberAndCommentNumber(boardNumber,commentNumber);
-
+            BoardEntity boardEntity = boardRepository.findByBoardNumber(boardNumber);
+            if(boardEntity == null) return DeleteCommentResponseDTO.noExistComment();
             if(entity == null){
                 return DeleteCommentResponseDTO.noExistComment();
             }
+
+            boardEntity.decreaseCommentCount();
+            boardRepository.save(boardEntity);
             commentRepository.delete(entity);
         }catch (Exception e){
             e.printStackTrace();

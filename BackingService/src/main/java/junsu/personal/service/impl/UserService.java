@@ -1,5 +1,6 @@
 package junsu.personal.service.impl;
 
+import jakarta.transaction.Transactional;
 import junsu.personal.auth.UserType;
 import junsu.personal.dto.object.MailDTO;
 import junsu.personal.dto.request.user.PostMailReceiveRequestDTO;
@@ -394,6 +395,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super DeleteUserResponseDTO> deleteUser(String userType, String userId) {
         try{
             if(userType.equals(UserType.STUDENT.getValue())){

@@ -13,7 +13,7 @@ public interface ITeacherService {
     ResponseEntity<? super GetApplyListResponseDTO> getApplyList(GetApplyListRequestDTO requestBody);
     ResponseEntity<? super GetApplyInfoResponseDTO> getApplyInfo(String teacherId, String studentId);
     ResponseEntity<? super PatchApplyResponseDTO> patchApply(PatchApplyRequestDTO requestBody, String userId);
-    ResponseEntity<? super GetApplyBeforeResponseDTO> getApplyBefore(String userId);
+    ResponseEntity<? super GetApplyBeforeResponseDTO> getApplyBefore(String teacherId,String userId);
     ResponseEntity<? super PostApplyTeacherResponseDTO> postApplyTeacher(PostApplyTeacherRequestDTO requestBody, String userId);
 
 }

@@ -69,10 +69,10 @@ public class TeacherController {
         return response;
     }
 
-    @GetMapping(value = "/apply")
-    public ResponseEntity<? super GetApplyBeforeResponseDTO> getApplyBefore(@AuthenticationPrincipal String userId){
+    @GetMapping(value = "/apply/{teacherId}")
+    public ResponseEntity<? super GetApplyBeforeResponseDTO> getApplyBefore(@AuthenticationPrincipal String userId, @PathVariable String teacherId){
         log.info("getApplyBefore Start!!!!");
-        ResponseEntity<? super GetApplyBeforeResponseDTO> response = teacherService.getApplyBefore(userId);
+        ResponseEntity<? super GetApplyBeforeResponseDTO> response = teacherService.getApplyBefore(teacherId,userId);
         log.info("getApplyBefore End!!!!");
         return response;
     }

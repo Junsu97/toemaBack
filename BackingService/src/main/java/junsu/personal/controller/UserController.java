@@ -45,7 +45,7 @@ public class UserController {
     }
 
     @GetMapping("/subject")
-    private ResponseEntity<? super GetTeacherSubjectResponseDTO> getTeacherSubject(String userId) {
+    private ResponseEntity<? super GetTeacherSubjectResponseDTO> getTeacherSubject(@AuthenticationPrincipal String userId) {
         try{
             ResponseEntity<? super GetTeacherSubjectResponseDTO> response = userService.getTeacherSubject(userId);
             return response;
