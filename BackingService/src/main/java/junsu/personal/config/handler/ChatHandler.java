@@ -68,10 +68,7 @@ public class ChatHandler extends TextWebSocketHandler {
                 String json = objectMapper.writeValueAsString(cDTO);
                 session.sendMessage(new TextMessage(json));
             }
-
                 log.info(roomInfo.keySet().toString());
-
-
 
         } else {
             session.close(CloseStatus.NOT_ACCEPTABLE);

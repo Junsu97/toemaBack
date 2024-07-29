@@ -201,64 +201,68 @@ public class AuthService implements IAuthService {
 
     @Override
     public ResponseEntity<? super PostFaceIdSignInResponseDTO> faceIdSignIn(PostFaceIdSignInRequestDTO pDTO) {
-        String token = null;
-        String userType = pDTO.userType();
-        double threshold  = 40;
-        LandMark landMarks = pDTO.landMarks();
-        double minDistance =Double.MAX_VALUE;
-        String userId = "";
+        String token = null;  // 토큰을 저장할 변수
+        String userType = pDTO.userType();  // 요청 DTO에서 사용자 유형을 가져옴
+        double threshold = 40;  // 임계값 설정
+        LandMark landMarks = pDTO.landMarks();  // 요청 DTO에서 랜드마크 가져옴
+        double minDistance = Double.MAX_VALUE;  // 최소 거리 초기화
+        String userId = "";  // 사용자 ID 초기화
+
         try {
-            if (userType.equals(UserType.STUDENT.getValue())) {
-                List<StudentFaceIdDomain> faceIdDomains = mongoStudentFaceIdRepository.findAll();
-                log.info("faceIdDomains 사이즈" + faceIdDomains.size());
-                log.info("findAll 끝");
-                for(StudentFaceIdDomain domain : faceIdDomains){
-                    log.info("faceIdDomains values : " + domain.getAccuracy());
-                    log.info("faceIdDomains values : " + domain.getLandMarks());
-                    double distance = calculateDifference(landMarks, domain.getLandMarks());
-                    log.info("distance : " + distance);
-                    if(distance < minDistance){
-                        minDistance = distance;
-                        log.info("minDistance : " + minDistance);
-                        log.info("domain user : " + domain.getUserId());
-                        if(minDistance < threshold){
-                            userId = domain.getUserId();
+            if (userType.equals(UserType.STUDENT.getValue())) {  // 사용자 유형이 학생인 경우
+                List<StudentFaceIdDomain> faceIdDomains = mongoStudentFaceIdRepository.findAll();  // 모든 학생 얼굴 ID 도메인 가져오기
+                log.info("faceIdDomains 사이즈" + faceIdDomains.size());  // 도메인 개수 로그 출력
+                log.info("findAll 끝");  // 로그 출력
+
+                for (StudentFaceIdDomain domain : faceIdDomains) {  // 모든 학생 얼굴 ID 도메인에 대해 반복
+                    log.info("faceIdDomains values : " + domain.getAccuracy());  // 도메인 정확도 로그 출력
+                    log.info("faceIdDomains values : " + domain.getLandMarks());  // 도메인 랜드마크 로그 출력
+
+                    double distance = calculateDifference(landMarks, domain.getLandMarks());  // 현재 랜드마크와 도메인 랜드마크의 거리 계산
+                    log.info("distance : " + distance);  // 계산된 거리 로그 출력
+
+                    if (distance < minDistance) {  // 현재 거리 < 최소 거리인 경우
+                        minDistance = distance;  // 최소 거리 업데이트
+                        log.info("minDistance : " + minDistance);  // 최소 거리 로그 출력
+                        log.info("domain user : " + domain.getUserId());  // 도메인 사용자 ID 로그 출력
+
+                        if (minDistance < threshold) {  // 최소 거리 < 임계값인 경우
+                            userId = domain.getUserId();  // 사용자 ID 업데이트
                         }
                     }
                 }
 
-            } else {
-                List<TeacherFaceIdDomain> faceIdDomains = mongoTeacherFaceIdRepository.findAll();
+            } else {  // 사용자 유형이 선생인 경우
+                List<TeacherFaceIdDomain> faceIdDomains = mongoTeacherFaceIdRepository.findAll();  // 모든 선생 얼굴 ID 도메인 가져오기
+                for (TeacherFaceIdDomain domain : faceIdDomains) {  // 모든 선생 얼굴 ID 도메인에 대해 반복
+                    double distance = calculateDifference(landMarks, domain.getLandMarks());  // 현재 랜드마크와 도메인 랜드마크의 거리 계산
+                    if (distance < minDistance) {  // 현재 거리 < 최소 거리인 경우
+                        minDistance = distance;  // 최소 거리 업데이트
+                        log.info("minDistance : " + minDistance, "id : " + domain.getUserId());  // 최소 거리 및 도메인 사용자 ID 로그 출력
 
-                for(TeacherFaceIdDomain domain : faceIdDomains){
-                    double distance = calculateDifference(landMarks, domain.getLandMarks());
-                    if(distance < minDistance){
-                        minDistance = distance;
-
-                        log.info("minDistance : " + minDistance, "id : " + domain.getUserId());
-                        if(Math.abs(minDistance) < threshold){
-                            userId = domain.getUserId();
+                        if (Math.abs(minDistance) < threshold) {  // 최소 거리 < 임계값인 경우
+                            userId = domain.getUserId();  // 사용자 ID 업데이트
                         }
                     }
-
                 }
             }
-            if(!userId.isEmpty()){
-                token = jwtProvider.create(userId, UserRole.USER.getValue(), userType);
-            }else{
-                return PostFaceIdSignInResponseDTO.signInFailed();
-
+            if (!userId.isEmpty()) {  // 사용자 ID가 존재하는 경우
+                token = jwtProvider.create(userId, UserRole.USER.getValue(), userType);  // JWT 토큰 생성
+            } else {  // 사용자 ID가 존재하지 않는 경우
+                return PostFaceIdSignInResponseDTO.signInFailed();  // 로그인 실패 응답 반환
             }
-        }catch (Exception e){
-            e.printStackTrace();
-            ResponseDTO.databaseError();
+
+        } catch (Exception e) {  // 예외 발생 시
+            e.printStackTrace();  // 예외 스택 트레이스 출력
+            ResponseDTO.databaseError();  // 데이터베이스 오류 응답 반환
         }
-        if(!userId.isEmpty()){
-            return PostFaceIdSignInResponseDTO.success(token);
-        }else{
-            return PostFaceIdSignInResponseDTO.signInFailed();
+        if (!userId.isEmpty()) {  // 사용자 ID가 존재하는 경우
+            return PostFaceIdSignInResponseDTO.success(token);  // 성공 응답 반환
+        } else {  // 사용자 ID가 존재하지 않는 경우
+            return PostFaceIdSignInResponseDTO.signInFailed();  // 로그인 실패 응답 반환
         }
     }
+
 
     @Override
     public ResponseEntity<? super PostFaceIdResponseDTO> postFaceId(PostFaceIDRequestDTO pDTO) {
@@ -288,23 +292,23 @@ public class AuthService implements IAuthService {
     }
 
 
-    private static double calculateDifference(LandMark landMark1, LandMark landMark2){
-        List<Position> totalPos1 = landMark1.positions();
-        List<Position> totalPos2 = landMark2.positions();
+    private static double calculateDifference(LandMark landMark1, LandMark landMark2) {
+        List<Position> totalPos1 = landMark1.positions();  // 첫 번째 랜드마크의 포지션 목록 가져오기
+        List<Position> totalPos2 = landMark2.positions();  // 두 번째 랜드마크의 포지션 목록 가져오기
 
-        double totalDifference = 0.0;
+        double totalDifference = 0.0;  // 전체 거리 차이를 저장할 변수 초기화
 
-        int numPos = totalPos1.size();
+        int numPos = totalPos1.size();  // 첫 번째 랜드마크의 포지션 개수 가져오기
 
-        for(int i = 0; i < numPos; i++){
-            Position pos1 = totalPos1.get(i);
-            Position pos2 = totalPos2.get(i);
+        for (int i = 0; i < numPos; i++) {  // 모든 포지션에 대해 반복
+            Position pos1 = totalPos1.get(i);  // 첫 번째 랜드마크의 현재 포지션 가져오기
+            Position pos2 = totalPos2.get(i);  // 두 번째 랜드마크의 현재 포지션 가져오기
             // 유클리드 거리를 사용하여 두 포지션 사이의 거리 차이 계산
-            double distance = Math.sqrt(Math.pow(pos1.x() - pos2.x(),2) + Math.pow(pos1.y() - pos2.y(), 2));
-            totalDifference += distance;
-
+            double distance = Math.sqrt(Math.pow(pos1.x() - pos2.x(), 2) + Math.pow(pos1.y() - pos2.y(), 2));
+            totalDifference += distance;  // 계산된 거리를 전체 거리 차이에 더하기
         }
 
-        return totalDifference / totalPos1.size();
+        return totalDifference / totalPos1.size();  // 평균 거리 차이 반환
     }
+
 }
