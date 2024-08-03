@@ -18,17 +18,17 @@ public class OpenFeignConfig {
         return new Contract.Default();
     }
 
-    /**
-     * OpenFeign 통해 호출되는 모든 API 헤더에 적용
-     */
-    @Bean
-    public RequestInterceptor requestInterceptor() {
-        return requestTemplate -> {
-            if(requestTemplate.url().contains("jejudatahub")){
-                requestTemplate.header("api-key", jejuAPI);
-            }
-        };
-    }
+//    /**
+//     * OpenFeign 통해 호출되는 모든 API 헤더에 적용
+//     */
+//    @Bean
+//    public RequestInterceptor requestInterceptor() {
+//        return requestTemplate -> {
+//            if(requestTemplate.url().contains("jejudatahub")){
+//                requestTemplate.header("api-key", jejuAPI);
+//            }
+//        };
+//    }
 
     @Bean
     Logger.Level feignLoggerLevel() {
