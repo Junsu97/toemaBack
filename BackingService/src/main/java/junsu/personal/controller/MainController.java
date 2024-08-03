@@ -22,7 +22,7 @@ public class MainController {
         return response;
     }
 
-    @GetMapping("/main/{lat}/{lon}")
+    @GetMapping("/{lat}/{lon}")
     public ResponseEntity<? super WeatherAPIResponseDTO> getWeather(@PathVariable double lat, @PathVariable double lon){
         ResponseEntity<? super WeatherAPIResponseDTO> response = apiService.getWeather(lat, lon);
         return response;

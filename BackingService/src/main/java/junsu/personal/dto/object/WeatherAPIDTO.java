@@ -1,5 +1,4 @@
 package junsu.personal.dto.object;
-
 import java.util.List;
 
 public record WeatherAPIDTO(
