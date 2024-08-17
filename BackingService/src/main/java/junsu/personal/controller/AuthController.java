@@ -11,6 +11,7 @@ import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.dto.response.auth.faceId.PostFaceIdResponseDTO;
 import junsu.personal.dto.response.auth.faceId.PostFaceIdSignInResponseDTO;
 import junsu.personal.service.IAuthService;
+import junsu.personal.service.impl.RecaptchaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -30,6 +31,7 @@ import java.util.Map;
 public class AuthController {
     private final IAuthService authService;
 
+    
     @Value("${univCert.api.key}")
     private String univCertAPI;
 
@@ -39,6 +41,8 @@ public class AuthController {
         ResponseEntity<? super SignInResponseDTO> response = authService.signIn(requestBody);
         return response;
     }
+    
+
 
     @PostMapping("/sign-up")
     public ResponseEntity<? super SignUpResponseDTO> signUp(@RequestBody @Valid SignUpRequestDTO requestBody){

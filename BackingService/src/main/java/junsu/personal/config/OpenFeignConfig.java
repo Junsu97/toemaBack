@@ -9,8 +9,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenFeignConfig {
-    @Value("${api.service.key}")
-    private String jejuAPI;
 
     // API 접속을 위해 접속 방법은 기본 값으로 설정(반드시 설정되어야함)
     @Bean

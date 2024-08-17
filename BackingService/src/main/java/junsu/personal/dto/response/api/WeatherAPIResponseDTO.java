@@ -21,7 +21,6 @@ public class WeatherAPIResponseDTO extends ResponseDTO {
 
     public static ResponseEntity<WeatherAPIResponseDTO> success(WeatherAPIDTO data){
         WeatherAPIResponseDTO result = new WeatherAPIResponseDTO(data);
-        log.info(""+result.result.weather());
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 }
