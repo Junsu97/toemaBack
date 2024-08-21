@@ -4,10 +4,7 @@ import junsu.personal.service.impl.RecaptchaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -18,6 +15,7 @@ import java.util.Map;
 public class RecaptchaController {
     private final RecaptchaService recaptchaService;
 
+    @ResponseBody
     @PostMapping("/verify-recaptcha")public ResponseEntity<String> verifyRecaptcha(@RequestBody Map<String, String> request) {
         String token= request.get("token");
 
