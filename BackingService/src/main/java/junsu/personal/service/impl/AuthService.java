@@ -15,14 +15,18 @@ import junsu.personal.dto.response.auth.faceId.PostFaceIdSignInResponseDTO;
 import junsu.personal.entity.StudentUserEntity;
 import junsu.personal.entity.TeacherSubjectEntity;
 import junsu.personal.entity.TeacherUserEntity;
+import junsu.personal.entity.domain.LoginHistoryDomain;
 import junsu.personal.entity.domain.StudentFaceIdDomain;
 import junsu.personal.entity.domain.TeacherFaceIdDomain;
 import junsu.personal.persistance.IMongoMapper;
 import junsu.personal.provider.JwtProvider;
 import junsu.personal.repository.*;
+import junsu.personal.repository.mongo.MongoLoginHistoryRepository;
 import junsu.personal.repository.mongo.MongoStudentFaceIdRepository;
 import junsu.personal.repository.mongo.MongoTeacherFaceIdRepository;
+import junsu.personal.repository.mongo.object.LoginHistory;
 import junsu.personal.service.IAuthService;
+import junsu.personal.util.DateUtil;
 import junsu.personal.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +35,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -42,6 +48,7 @@ public class AuthService implements IAuthService {
     private final TeacherUserRepository teacherUserRepository;
     private final MongoStudentFaceIdRepository mongoStudentFaceIdRepository;
     private final MongoTeacherFaceIdRepository mongoTeacherFaceIdRepository;
+    private final MongoLoginHistoryRepository mongoLoginHistoryRepository;
     private final IMongoMapper mongoMapper;
     private final JwtProvider jwtProvider;
 
@@ -188,7 +195,14 @@ public class AuthService implements IAuthService {
                 if (!isMatched) return SignInResponseDTO.signInFailed();
             }
 
-
+            LoginHistoryDomain historyDomain = mongoLoginHistoryRepository.findByUserId(userId);
+            if (historyDomain == null) {
+                historyDomain = new LoginHistoryDomain();
+                historyDomain.setUserId(userId);
+            }
+            String now = DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss");
+            historyDomain.getLoginHistoryList().add(new LoginHistory(now));
+            mongoMapper.insertLoginHistory(historyDomain);
             token = jwtProvider.create(userId, UserRole.USER.getValue(), userType);
 
         } catch (Exception e) {
@@ -207,7 +221,6 @@ public class AuthService implements IAuthService {
         LandMark landMarks = pDTO.landMarks();  // 요청 DTO에서 랜드마크 가져옴
         double minDistance = Double.MAX_VALUE;  // 최소 거리 초기화
         String userId = "";  // 사용자 ID 초기화
-
         try {
             if (userType.equals(UserType.STUDENT.getValue())) {  // 사용자 유형이 학생인 경우
                 List<StudentFaceIdDomain> faceIdDomains = mongoStudentFaceIdRepository.findAll();  // 모든 학생 얼굴 ID 도메인 가져오기
@@ -247,6 +260,14 @@ public class AuthService implements IAuthService {
                 }
             }
             if (!userId.isEmpty()) {  // 사용자 ID가 존재하는 경우
+                LoginHistoryDomain historyDomain = mongoLoginHistoryRepository.findByUserId(userId);
+                if (historyDomain == null) {
+                    historyDomain = new LoginHistoryDomain();
+                    historyDomain.setUserId(userId);
+                }
+                String now = DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss");
+                historyDomain.getLoginHistoryList().add(new LoginHistory(now));
+                mongoMapper.insertLoginHistory(historyDomain);
                 token = jwtProvider.create(userId, UserRole.USER.getValue(), userType);  // JWT 토큰 생성
             } else {  // 사용자 ID가 존재하지 않는 경우
                 return PostFaceIdSignInResponseDTO.signInFailed();  // 로그인 실패 응답 반환
@@ -311,4 +332,9 @@ public class AuthService implements IAuthService {
         return totalDifference / totalPos1.size();  // 평균 거리 차이 반환
     }
 
+    private LoginHistory getLastLogin(LoginHistoryDomain domain){
+        List<LoginHistory> histories = domain.getLoginHistoryList();
+        if(histories.size() < 2) return null;
+        return histories.get(histories.size() - 2);
+    }
 }

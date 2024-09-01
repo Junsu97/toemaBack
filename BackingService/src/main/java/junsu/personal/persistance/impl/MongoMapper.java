@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import junsu.personal.auth.UserType;
 import junsu.personal.dto.request.auth.faceId.PostFaceIDRequestDTO;
+import junsu.personal.entity.domain.LoginHistoryDomain;
 import junsu.personal.persistance.AbstractMongoDBCommon;
 import junsu.personal.persistance.IMongoMapper;
+import junsu.personal.repository.mongo.object.LoginHistory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
@@ -20,7 +22,7 @@ import java.util.Map;
 @Component
 public class MongoMapper extends AbstractMongoDBCommon implements IMongoMapper {
     private final MongoTemplate mongodb;
-
+    private static final String LOGIN_HISTORY_COLLECTION = "loginHistory";
     @Override
     public int insertFaceId(PostFaceIDRequestDTO pDTO) throws Exception {
         log.info(this.getClass().getName() + ".insertFaceId Start!!!");
@@ -33,6 +35,17 @@ public class MongoMapper extends AbstractMongoDBCommon implements IMongoMapper {
         res = 1;
 
         log.info(this.getClass().getName() + ".insertFaceId End!!!");
+        return res;
+    }
+
+    @Override
+    public int insertLoginHistory( LoginHistoryDomain history) {
+        log.info(this.getClass().getName() + ".insertLoginHistory Start!!!");
+        int res = 0;
+        MongoCollection<Document> col = mongodb.getCollection(LOGIN_HISTORY_COLLECTION);
+        col.insertOne(new Document(new ObjectMapper().convertValue(history, Map.class)));
+        res = 1;
+        log.info(this.getClass().getName() + ".insertLoginHistory End!!!");
         return res;
     }
 

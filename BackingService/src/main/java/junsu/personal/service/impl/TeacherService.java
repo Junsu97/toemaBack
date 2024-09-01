@@ -1,5 +1,6 @@
 package junsu.personal.service.impl;
 
+import com.querydsl.core.types.dsl.StringPath.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -15,8 +16,6 @@ import junsu.personal.dto.response.ResponseDTO;
 import junsu.personal.dto.response.teacher.*;
 import junsu.personal.entity.*;
 import junsu.personal.repository.MatchRepository;
-import junsu.personal.repository.StudentUserRepository;
-import junsu.personal.repository.TeacherSubjectRepository;
 import junsu.personal.repository.TeacherUserRepository;
 import junsu.personal.repository.resultSet.GetTeacherInfoResultSet;
 import junsu.personal.service.ITeacherService;
@@ -24,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 
