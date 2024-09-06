@@ -18,7 +18,7 @@ public class MainController {
 
     @GetMapping("/{grade}")
     public ResponseEntity<? super JejuApiResponseDTO> getDate(@PathVariable String grade){
-        ResponseEntity<? super JejuApiResponseDTO> response = apiService.getApiDate(grade);
+        ResponseEntity<? super JejuApiResponseDTO> response = apiService.getApiData(grade);
         return response;
     }
 

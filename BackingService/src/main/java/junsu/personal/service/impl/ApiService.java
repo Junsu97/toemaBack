@@ -1,5 +1,6 @@
 package junsu.personal.service.impl;
 
+import feign.FeignException;
 import junsu.personal.dto.object.ApiDTO;
 import junsu.personal.dto.object.WeatherAPIDTO;
 import junsu.personal.dto.response.ResponseDTO;
@@ -11,6 +12,9 @@ import junsu.personal.service.IFeignWeatherAPIService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -31,42 +35,10 @@ public class ApiService implements IApiService {
     private String weatherKey;
 
     private ApiDTO getData(String grade) {
-//        String baseUrl = "open.jejudatahub.net/api/proxy/9abD88tb7b8t9b97D9t8D9bttat79Daa";
-//        String url = UriComponentsBuilder.newInstance()
-//                .scheme("https")
-//                .host(baseUrl)
-//                .pathSegment(apiKey)
-//                .queryParam("grade",grade)
-//                .build().toUriString();
-//
-//        log.info("url : " + url);
-//        HttpHeaders headers = new HttpHeaders();
-//
-//        restTemplate.getInterceptors().add(((request, body, execution) -> {
-//            ClientHttpResponse response = execution.execute(request, body);
-//            response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-//            return response;
-//        }));
-//
-//        HttpEntity entity = new HttpEntity(headers);
-//        ResponseEntity<ApiDTO> response = restTemplate.exchange(url, HttpMethod.GET, entity, ApiDTO.class);
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        ApiDTO dataList = null;
-//        try{
-//            dataList = objectMapper.convertValue(response.getBody(), ApiDTO.class);
-//        }catch (Exception e){
-//            e.printStackTrace();
-//            return null;
-//        }
-//        return dataList;
         ApiDTO result = null;
-        try{
-            result = feignAPIService.getData(apiKey,grade);
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            return result;
-        }
+        try{result = feignAPIService.getData(apiKey,grade);}
+        catch (Exception e){e.printStackTrace();}
+        finally {return result;}
 
     }
 
@@ -81,16 +53,23 @@ public class ApiService implements IApiService {
         }
     }
 
-    public ResponseEntity<? super JejuApiResponseDTO> getApiDate(String grade){
-        ApiDTO data = null;
-        try{
-            data = getData(grade);
-        }catch (Exception e){
-            e.printStackTrace();
-            return ResponseDTO.validationFailed();
+    @Retryable(value = { FeignException.class }, maxAttempts = 3, backoff = @Backoff(delay = 2000))
+    public ResponseEntity<? super JejuApiResponseDTO> getApiData(String grade) {
+        try {
+            ApiDTO result = getData(grade);
+            return JejuApiResponseDTO.success(result);
+        } catch (FeignException e) {
+            // 예외 처리 로직 추가
+            return JejuApiResponseDTO.validationFailed();
         }
-        return JejuApiResponseDTO.success(data);
     }
+
+    @Recover
+    public ResponseEntity<? super JejuApiResponseDTO> recover(FeignException e, String grade) {
+        // 재시도 실패 시 처리 로직
+        return JejuApiResponseDTO.validationFailed();
+    }
+
 
     @Override
     public ResponseEntity<? super WeatherAPIResponseDTO> getWeather(double lat, double lon) {

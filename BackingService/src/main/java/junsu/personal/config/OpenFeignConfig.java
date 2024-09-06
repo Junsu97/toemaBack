@@ -2,6 +2,7 @@ package junsu.personal.config;
 
 import feign.Contract;
 import feign.Logger;
+import feign.Request;
 import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -41,4 +42,6 @@ public class OpenFeignConfig {
 
         return Logger.Level.FULL;
     }
+
+
 }
