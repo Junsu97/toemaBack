@@ -19,8 +19,9 @@ public class GetUserResponseDTO extends ResponseDTO {
     private String school;
     private Boolean emailAuth;
     private String userType;
+    private String lastLogin;
 
-    private GetUserResponseDTO(StudentUserEntity userEntity){
+    private GetUserResponseDTO(StudentUserEntity userEntity, String lastLogin){
         super(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
         this.userId = userEntity.getUserId();
         this.nickname = userEntity.getNickname();
@@ -30,8 +31,9 @@ public class GetUserResponseDTO extends ResponseDTO {
         this.addr = userEntity.getAddr();
         this.addrDetail = userEntity.getAddrDetail();
         this.userType = "STUDENT";
+        this.lastLogin = lastLogin;
     }
-    private GetUserResponseDTO(TeacherUserEntity userEntity){
+    private GetUserResponseDTO(TeacherUserEntity userEntity, String lastLogin){
         super(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
         this.userId = userEntity.getUserId();
         this.nickname = userEntity.getNickname();
@@ -41,14 +43,15 @@ public class GetUserResponseDTO extends ResponseDTO {
         this.addr = userEntity.getAddr();
         this.addrDetail = userEntity.getAddrDetail();
         this.userType = "TEACHER";
+        this.lastLogin = lastLogin;
     }
 
-    public static ResponseEntity<GetUserResponseDTO> success(StudentUserEntity userEntity){
-        GetUserResponseDTO result = new GetUserResponseDTO(userEntity);
+    public static ResponseEntity<GetUserResponseDTO> success(StudentUserEntity userEntity, String lastLogin){
+        GetUserResponseDTO result = new GetUserResponseDTO(userEntity, lastLogin);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
-    public static ResponseEntity<GetUserResponseDTO> success(TeacherUserEntity userEntity){
-        GetUserResponseDTO result = new GetUserResponseDTO(userEntity);
+    public static ResponseEntity<GetUserResponseDTO> success(TeacherUserEntity userEntity, String lastLogin){
+        GetUserResponseDTO result = new GetUserResponseDTO(userEntity, lastLogin);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 

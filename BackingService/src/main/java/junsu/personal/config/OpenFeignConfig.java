@@ -42,6 +42,9 @@ public class OpenFeignConfig {
 
         return Logger.Level.FULL;
     }
-
+    @Bean
+    public Request.Options requestOptions() {
+        return new Request.Options(5000, 30000); // 연결 타임아웃: 5초, 응답 대기 타임아웃: 30초
+    }
 
 }

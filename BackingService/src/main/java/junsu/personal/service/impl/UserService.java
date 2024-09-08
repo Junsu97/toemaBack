@@ -13,15 +13,19 @@ import junsu.personal.dto.response.user.PostMailSendResponseDTO;
 import junsu.personal.dto.response.auth.SignUpResponseDTO;
 import junsu.personal.dto.response.user.*;
 import junsu.personal.entity.*;
+import junsu.personal.entity.domain.LoginHistoryDomain;
 import junsu.personal.entity.domain.StudentFaceIdDomain;
 import junsu.personal.entity.domain.TeacherFaceIdDomain;
 import junsu.personal.persistance.IMyRedisMapper;
 import junsu.personal.repository.*;
+import junsu.personal.repository.mongo.MongoLoginHistoryRepository;
 import junsu.personal.repository.mongo.MongoStudentFaceIdRepository;
 import junsu.personal.repository.mongo.MongoTeacherFaceIdRepository;
+import junsu.personal.repository.mongo.object.LoginHistory;
 import junsu.personal.service.IBoardService;
 import junsu.personal.service.IFileService;
 import junsu.personal.service.IUserService;
+import junsu.personal.util.DateUtil;
 import junsu.personal.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +54,7 @@ public class UserService implements IUserService {
     private final CommentRepository commentRepository;
     private final MongoStudentFaceIdRepository mongoStudentFaceIdRepository;
     private final MongoTeacherFaceIdRepository mongoTeacherFaceIdRepository;
+    private final MongoLoginHistoryRepository mongoLoginHistoryRepository;
     private final JavaMailSender javaMailSender;
     private final IMyRedisMapper myRedisMapper;
     @Value("${spring.mail.username}")
@@ -60,10 +65,12 @@ public class UserService implements IUserService {
     public ResponseEntity<? super GetUserResponseDTO> getUser(String userId) {
         StudentUserEntity studentUserEntity = null;
         TeacherUserEntity teacherUserEntity = null;
+        String lastLogin = "";
         try {
             studentUserEntity = studentUserRepository.findByUserId(userId);
             teacherUserEntity = teacherUserRepository.findByUserId(userId);
-
+            LoginHistoryDomain domain = mongoLoginHistoryRepository.findByUserId(userId);
+            lastLogin = getLastLogin(domain);
             if (studentUserEntity == null && teacherUserEntity == null) return GetUserResponseDTO.notExistUser();
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,9 +78,9 @@ public class UserService implements IUserService {
         }
 
         if (studentUserEntity != null && teacherUserEntity == null) {
-            return GetUserResponseDTO.success(studentUserEntity);
+            return GetUserResponseDTO.success(studentUserEntity, lastLogin);
         } else {
-            return GetUserResponseDTO.success(teacherUserEntity);
+            return GetUserResponseDTO.success(teacherUserEntity, lastLogin);
         }
     }
     @Override
@@ -496,5 +503,12 @@ public class UserService implements IUserService {
 
     private String generateAuthNumber() {
         return String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1000000));
+    }
+    private String getLastLogin(LoginHistoryDomain domain) {
+        List<LoginHistory> histories = domain.getLoginHistoryList();
+        if (histories.isEmpty() || histories.size() == 1) {
+            return null;
+        }
+        return histories.get(histories.size() - 2).toString();
     }
 }

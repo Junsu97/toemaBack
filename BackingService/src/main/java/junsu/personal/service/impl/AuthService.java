@@ -200,7 +200,7 @@ public class AuthService implements IAuthService {
                 historyDomain = new LoginHistoryDomain();
                 historyDomain.setUserId(userId);
             }
-            String now = DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss");
+            String now = DateUtil.getDateTime("yyyy-MM-dd");
             historyDomain.getLoginHistoryList().add(new LoginHistory(now));
             mongoMapper.insertLoginHistory(historyDomain);
             token = jwtProvider.create(userId, UserRole.USER.getValue(), userType);
@@ -265,7 +265,7 @@ public class AuthService implements IAuthService {
                     historyDomain = new LoginHistoryDomain();
                     historyDomain.setUserId(userId);
                 }
-                String now = DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss");
+                String now = DateUtil.getDateTime("yyyy-MM-dd");
                 historyDomain.getLoginHistoryList().add(new LoginHistory(now));
                 mongoMapper.insertLoginHistory(historyDomain);
                 token = jwtProvider.create(userId, UserRole.USER.getValue(), userType);  // JWT 토큰 생성
@@ -332,9 +332,4 @@ public class AuthService implements IAuthService {
         return totalDifference / totalPos1.size();  // 평균 거리 차이 반환
     }
 
-    private LoginHistory getLastLogin(LoginHistoryDomain domain){
-        List<LoginHistory> histories = domain.getLoginHistoryList();
-        if(histories.size() < 2) return null;
-        return histories.get(histories.size() - 2);
-    }
 }
