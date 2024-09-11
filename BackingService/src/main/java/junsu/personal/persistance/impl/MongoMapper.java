@@ -59,12 +59,19 @@ public class MongoMapper extends AbstractMongoDBCommon implements IMongoMapper {
             latestLoginHistory.ifPresent(loginHistory -> {
                 // 기존 도큐먼트가 있을 경우 loginHistoryList에 기록 추가
                 if (existingDocument != null) {
-                    Document newLoginHistory = new Document("timeStamp", loginHistory.timeStamp());
+                    List<Document> existingHistoryList = (List<Document>) existingDocument.get("loginHistoryList");
+                    boolean isDuplicate = existingHistoryList.stream()
+                            .anyMatch(doc -> doc.getString("timeStamp").equals(loginHistory.timeStamp()));
 
-                    col.updateOne(
-                            new Document("userId", history.getUserId()),
-                            new Document("$push", new Document("loginHistoryList", newLoginHistory))
-                    );
+                    if(!isDuplicate){
+                        Document newLoginHistory = new Document("timeStamp", loginHistory.timeStamp());
+
+                        col.updateOne(
+                                new Document("userId", history.getUserId()),
+                                new Document("$push", new Document("loginHistoryList", newLoginHistory))
+                        );
+                    }
+
                 } else {
                     // 기존 도큐먼트가 없을 경우 새로 생성
                     col.insertOne(new Document(new ObjectMapper().convertValue(history, Map.class)));
