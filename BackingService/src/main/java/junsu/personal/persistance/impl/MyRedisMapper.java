@@ -1,5 +1,6 @@
 package junsu.personal.persistance.impl;
 
+import junsu.personal.dto.object.CrawlingDTO;
 import junsu.personal.persistance.IMyRedisMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +9,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -48,5 +50,34 @@ public class MyRedisMapper implements IMyRedisMapper {
         log.info(this.getClass().getName() + ".getAuth End!!!!");
         deleteRedisKey(redisKey);
         return res;
+    }
+
+    @Override
+    public int saveCrawling(String redisKey, List<CrawlingDTO> list) throws Exception {
+        log.info(this.getClass().getName() + ".saveCrawling Start!!!");
+
+        redisDB.setKeySerializer(new StringRedisSerializer());
+        redisDB.setValueSerializer(new Jackson2JsonRedisSerializer<>(CrawlingDTO.class));
+
+        this.deleteRedisKey(redisKey);
+        redisDB.opsForValue().set(redisKey, list);
+
+        redisDB.expire(redisKey, 7, TimeUnit.MINUTES);
+        log.info(this.getClass().getName() + ".saveCrawling End!!!");
+
+        return 1;
+    }
+
+    @Override
+    public List<CrawlingDTO> getCrawling(String redisKey) throws Exception {
+        log.info(this.getClass().getName() + ".getCrawling Start!!!");
+
+        redisDB.setKeySerializer(new StringRedisSerializer());
+        redisDB.setValueSerializer(new Jackson2JsonRedisSerializer<>(CrawlingDTO.class));
+
+        List<CrawlingDTO> result = (List<CrawlingDTO>) redisDB.opsForValue().get(redisKey);
+        log.info(this.getClass().getName() + ".getCrawling End!!!");
+
+        return result;
     }
 }
