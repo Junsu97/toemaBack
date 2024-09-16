@@ -47,9 +47,10 @@ public class SimpleLogAOP {
         // 메서드 정보 받아오기
         Method method = getMethod(joinPoint);
         log.info("======= method name = {} =======", method.getName());
-
-        log.info("return type = {}", returnObj.getClass().getSimpleName());
-        log.info("return value = {}", returnObj);
+        if(returnObj != null){
+            log.info("return type = {}", returnObj.getClass().getSimpleName());
+            log.info("return value = {}", returnObj);
+        }
     }
 
 

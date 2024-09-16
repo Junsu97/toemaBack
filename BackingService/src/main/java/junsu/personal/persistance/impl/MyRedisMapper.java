@@ -9,6 +9,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -60,7 +61,7 @@ public class MyRedisMapper implements IMyRedisMapper {
         redisDB.setValueSerializer(new Jackson2JsonRedisSerializer<>(CrawlingDTO.class));
 
         this.deleteRedisKey(redisKey);
-        redisDB.opsForValue().set(redisKey, list);
+        list.forEach(dto -> redisDB.opsForList().rightPush(redisKey, dto));
 
         redisDB.expire(redisKey, 7, TimeUnit.MINUTES);
         log.info(this.getClass().getName() + ".saveCrawling End!!!");
@@ -71,13 +72,17 @@ public class MyRedisMapper implements IMyRedisMapper {
     @Override
     public List<CrawlingDTO> getCrawling(String redisKey) throws Exception {
         log.info(this.getClass().getName() + ".getCrawling Start!!!");
+        List<CrawlingDTO> crawlingList = null;
 
         redisDB.setKeySerializer(new StringRedisSerializer());
         redisDB.setValueSerializer(new Jackson2JsonRedisSerializer<>(CrawlingDTO.class));
 
-        List<CrawlingDTO> result = (List<CrawlingDTO>) redisDB.opsForValue().get(redisKey);
-        log.info(this.getClass().getName() + ".getCrawling End!!!");
+        if(redisDB.hasKey(redisKey)){
+            crawlingList = (List) redisDB.opsForList().range(redisKey, 0, -1);
+        }
 
-        return result;
+        log.info(this.getClass().getName() + ".getCrawling End!!!");
+        return crawlingList;
     }
+
 }
