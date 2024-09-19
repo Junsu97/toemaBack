@@ -63,7 +63,7 @@ public class MyRedisMapper implements IMyRedisMapper {
         this.deleteRedisKey(redisKey);
         list.forEach(dto -> redisDB.opsForList().rightPush(redisKey, dto));
 
-        redisDB.expire(redisKey, 7, TimeUnit.MINUTES);
+        redisDB.expire(redisKey, 7, TimeUnit.DAYS);
         log.info(this.getClass().getName() + ".saveCrawling End!!!");
 
         return 1;

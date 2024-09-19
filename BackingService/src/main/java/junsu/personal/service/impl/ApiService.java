@@ -53,20 +53,22 @@ public class ApiService implements IApiService {
         }
     }
 
-    @Retryable(value = { FeignException.class }, maxAttempts = 3, backoff = @Backoff(delay = 2000))
+    @Retryable(value = { FeignException.class }, maxAttempts = 5, backoff = @Backoff(delay = 2000))
     public ResponseEntity<? super JejuApiResponseDTO> getApiData(String grade) {
         try {
+            log.info("리트라이");
             ApiDTO result = getData(grade);
             return JejuApiResponseDTO.success(result);
         } catch (FeignException e) {
             // 예외 처리 로직 추가
-            return JejuApiResponseDTO.validationFailed();
+            return recover(e, grade);
         }
     }
 
     @Recover
     public ResponseEntity<? super JejuApiResponseDTO> recover(FeignException e, String grade) {
         // 재시도 실패 시 처리 로직
+        e.printStackTrace();
         return JejuApiResponseDTO.validationFailed();
     }
 
