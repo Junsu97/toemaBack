@@ -32,8 +32,10 @@ public class CrawlingService implements ICrawlingService {
     private final IMyRedisMapper redisMapper;
 
 
-//    @Scheduled(fixedRate = 150 * 60 * 60 * 1000)
-    @Scheduled(fixedRate = 540000000) // 150 시간마다 실행
+    //    @Scheduled(fixedRate = 150 * 60 * 60 * 1000)
+//    @Scheduled(fixedRate = 540000000) // 150 시간마다 실행
+//    @Scheduled(fixedRate = 24 * 60 * 60 * 1000)
+    @Scheduled(fixedRate = 86400000) // 24시간 마다 실행
     public void scheduleCrawling() {
         try {
             log.info("스케줄링 실행됨");
@@ -52,7 +54,6 @@ public class CrawlingService implements ICrawlingService {
 //            e.printStackTrace();
 //        }
 //    }
-
 
 
     public int getCrawling() throws Exception {

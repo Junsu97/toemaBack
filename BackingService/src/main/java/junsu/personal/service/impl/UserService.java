@@ -505,10 +505,15 @@ public class UserService implements IUserService {
         return String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1000000));
     }
     private String getLastLogin(LoginHistoryDomain domain) {
-        List<LoginHistory> histories = domain.getLoginHistoryList();
-        if (histories.isEmpty() || histories.size() == 1) {
-            return null;
+        if (domain == null || domain.getLoginHistoryList() == null || domain.getLoginHistoryList().isEmpty()) {
+            return "No login history";
         }
-        return histories.get(histories.size() - 2).toString();
+
+        // 마지막 로그인 기록을 가져옴
+        LoginHistory lastLogin = domain.getLoginHistoryList().get(0);
+
+        // timeStamp를 문자열로 변환
+        return lastLogin.timeStamp();  // 필요에 따라 포맷팅 가능
     }
+
 }

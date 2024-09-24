@@ -195,21 +195,22 @@ public class AuthService implements IAuthService {
                 if (!isMatched) return SignInResponseDTO.signInFailed();
             }
 
-            LoginHistoryDomain historyDomain = mongoLoginHistoryRepository.findByUserId(userId);
-            if (historyDomain == null) {
-                historyDomain = new LoginHistoryDomain();
-                historyDomain.setUserId(userId);
-            }
-            String now = DateUtil.getDateTime("yyyy-MM-dd");
-            historyDomain.getLoginHistoryList().add(new LoginHistory(now));
-            mongoMapper.insertLoginHistory(historyDomain);
+
             token = jwtProvider.create(userId, UserRole.USER.getValue(), userType);
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseDTO.databaseError();
         }
-
+        LoginHistoryDomain historyDomain = mongoLoginHistoryRepository.findByUserId(pDTO.userId());
+        if (historyDomain == null) {
+            historyDomain = new LoginHistoryDomain();
+            historyDomain.setUserId(pDTO.userId());
+        }
+        String now = DateUtil.getDateTime("yyyy-MM-dd");
+        historyDomain.getLoginHistoryList().add(new LoginHistory(now));
+        log.info("dddd");
+        mongoMapper.insertLoginHistory(historyDomain);
         return SignInResponseDTO.success(token);
     }
 

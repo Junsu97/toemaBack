@@ -14,6 +14,10 @@ import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,10 +64,25 @@ public class MongoMapper extends AbstractMongoDBCommon implements IMongoMapper {
                 // 기존 도큐먼트가 있을 경우 loginHistoryList에 기록 추가
                 if (existingDocument != null) {
                     List<Document> existingHistoryList = (List<Document>) existingDocument.get("loginHistoryList");
-                    boolean isDuplicate = existingHistoryList.stream()
-                            .anyMatch(doc -> doc.getString("timeStamp").equals(loginHistory.timeStamp()));
 
-                    if(!isDuplicate){
+                    // 오늘 날짜와 로그인 기록의 날짜 비교
+                    boolean isDuplicate = existingHistoryList.stream().anyMatch(doc -> {
+                        String timeStampStr = doc.getString("timeStamp");
+                        try {
+                            // LocalDateTime으로 변환 (날짜 문자열에서 시간 정보가 없으므로 자정 시간으로 변환)
+                            LocalDateTime timeStamp = LocalDate.parse(timeStampStr, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
+
+                            // 오늘 날짜와 비교
+                            return timeStamp.toLocalDate().equals(LocalDate.now());
+                        } catch (DateTimeParseException e) {
+                            log.warn("Invalid date format for timeStamp: " + timeStampStr);
+                            return false;
+                        }
+                    });
+
+                    log.info("isDuplicate: " + isDuplicate);
+
+                    if(!isDuplicate) {
                         Document newLoginHistory = new Document("timeStamp", loginHistory.timeStamp());
 
                         col.updateOne(
@@ -85,6 +104,8 @@ public class MongoMapper extends AbstractMongoDBCommon implements IMongoMapper {
         log.info(this.getClass().getName() + ".insertLoginHistory End!!!");
         return res;
     }
+
+
 
 
 
